@@ -1,0 +1,46 @@
+.atlas-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--atlas-surface);
+  border-right: 1px solid var(--atlas-border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 8px;
+}
+
+.atlas-sidebar__title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--atlas-text-primary);
+  padding: 0 8px 16px;
+}
+
+.atlas-sidebar__nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.atlas-sidebar__link {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.atlas-sidebar__link:hover {
+  background: var(--atlas-surface-raised);
+  color: var(--atlas-text-primary);
+}
+
+.atlas-sidebar__link--active {
+  background: var(--atlas-accent-muted);
+  color: var(--atlas-accent);
+}

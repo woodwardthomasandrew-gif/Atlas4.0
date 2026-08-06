@@ -1,0 +1,41 @@
+{
+  "name": "alaruel-atlas",
+  "productName": "Alaruel Atlas",
+  "version": "4.0.0",
+  "description": "Offline workshop for creating structured tabletop RPG assets.",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "vite:dev": "vite",
+    "electron:compile": "tsc -p electron/tsconfig.json && node -e \"require('fs').copyFileSync('electron/package.json','dist-electron/package.json')\"",
+    "electron:watch": "wait-on tcp:5173 && cross-env ATLAS_DEV=1 electron .",
+    "dev": "npm run electron:compile && concurrently -k -n VITE,ELECTRON -c cyan,magenta \"npm run vite:dev\" \"npm run electron:watch\"",
+    "build": "tsc -b && vite build && npm run electron:compile",
+    "typecheck": "tsc -b --noEmit && tsc -p electron/tsconfig.json --noEmit",
+    "start": "electron .",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "sql.js": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/sql.js": "^1.4.9",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^10.0.4",
+    "cross-env": "^10.1.0",
+    "electron": "^31.3.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "wait-on": "^9.1.0"
+  }
+}

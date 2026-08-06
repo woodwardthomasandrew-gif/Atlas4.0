@@ -1,0 +1,21 @@
+.magic-item-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.magic-item-preview__meta {
+  display: flex;
+  gap: 6px;
+}
+
+.magic-item-preview__type {
+  color: var(--atlas-text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+.magic-item-preview__description {
+  margin: 0;
+  white-space: pre-wrap;
+}

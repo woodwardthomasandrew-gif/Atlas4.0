@@ -1,0 +1,54 @@
+.atlas-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--atlas-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.atlas-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.atlas-button--primary {
+  background: var(--atlas-accent);
+  color: #0c0f14;
+}
+.atlas-button--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.atlas-button--secondary {
+  background: var(--atlas-surface-raised);
+  border-color: var(--atlas-border);
+  color: var(--atlas-text-primary);
+}
+.atlas-button--secondary:hover:not(:disabled) {
+  border-color: var(--atlas-accent);
+}
+
+.atlas-button--ghost {
+  background: transparent;
+  color: var(--atlas-text-secondary);
+}
+.atlas-button--ghost:hover:not(:disabled) {
+  color: var(--atlas-text-primary);
+  background: var(--atlas-surface-raised);
+}
+
+.atlas-button--danger {
+  background: transparent;
+  border-color: var(--atlas-danger);
+  color: var(--atlas-danger);
+}
+.atlas-button--danger:hover:not(:disabled) {
+  background: var(--atlas-danger);
+  color: #fff;
+}

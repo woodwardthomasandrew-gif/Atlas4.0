@@ -1,0 +1,22 @@
+.magic-item-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.magic-item-list__header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.magic-item-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.magic-item-list__card-link {
+  text-decoration: none;
+  color: inherit;
+}

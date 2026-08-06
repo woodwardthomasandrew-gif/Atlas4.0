@@ -1,0 +1,41 @@
+.magic-item-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+}
+
+.magic-item-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+}
+
+.magic-item-editor__field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.magic-item-editor__select,
+.magic-item-editor__textarea {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 8px 10px;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.magic-item-editor__select:focus,
+.magic-item-editor__textarea:focus {
+  border-color: var(--atlas-accent);
+}
+
+.magic-item-editor__textarea {
+  resize: vertical;
+}

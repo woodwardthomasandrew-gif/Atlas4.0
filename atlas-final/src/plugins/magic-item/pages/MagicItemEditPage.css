@@ -1,0 +1,36 @@
+.magic-item-edit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.magic-item-edit__header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.magic-item-edit__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.magic-item-edit__errors {
+  border-color: var(--atlas-danger);
+  color: var(--atlas-danger);
+  margin-bottom: 16px;
+}
+
+.magic-item-edit__errors p {
+  margin: 0;
+}
+
+.magic-item-edit__name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+  max-width: 480px;
+  margin-bottom: 16px;
+}

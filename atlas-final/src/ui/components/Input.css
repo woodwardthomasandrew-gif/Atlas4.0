@@ -1,0 +1,18 @@
+.atlas-input {
+  height: 32px;
+  padding: 0 10px;
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  outline: none;
+  width: 100%;
+}
+
+.atlas-input:focus {
+  border-color: var(--atlas-accent);
+}
+
+.atlas-input::placeholder {
+  color: var(--atlas-text-secondary);
+}

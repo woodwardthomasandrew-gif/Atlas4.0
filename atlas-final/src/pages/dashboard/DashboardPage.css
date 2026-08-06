@@ -1,0 +1,34 @@
+.atlas-dashboard__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.atlas-dashboard__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.atlas-dashboard__stats {
+  display: flex;
+  gap: 16px;
+}
+
+.atlas-dashboard__stat {
+  min-width: 140px;
+}
+
+.atlas-dashboard__stat-value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.atlas-dashboard__stat-label {
+  color: var(--atlas-text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
