@@ -1,0 +1,78 @@
+.spell-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 380px;
+  background: var(--atlas-surface-raised);
+  border: 2px solid #4a6fd4;
+  border-radius: var(--atlas-radius-md, 10px);
+  padding: 16px 18px;
+  font-size: 13px;
+  color: var(--atlas-text-primary);
+}
+
+.spell-card p {
+  margin: 2px 0;
+}
+
+.spell-card__artwork {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--atlas-radius-sm);
+  margin-bottom: 8px;
+}
+
+.spell-card__header {
+  margin-bottom: 2px;
+}
+
+.spell-card__name {
+  margin: 0;
+  font-size: 20px;
+  color: #4a6fd4;
+  font-family: serif;
+}
+
+.spell-card__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--atlas-text-secondary);
+}
+
+.spell-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.spell-card__divider {
+  height: 2px;
+  background: linear-gradient(to right, #4a6fd4, transparent);
+  margin: 8px 0;
+}
+
+.spell-card__description {
+  white-space: pre-wrap;
+}
+
+.spell-card__section {
+  border-top: 1px dashed var(--atlas-border);
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.spell-card__section h3 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--atlas-text-secondary);
+}
+
+.spell-card__classes {
+  margin-top: 8px;
+  color: var(--atlas-text-secondary);
+}

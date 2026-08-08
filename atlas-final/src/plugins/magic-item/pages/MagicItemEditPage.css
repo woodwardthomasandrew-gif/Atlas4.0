@@ -34,3 +34,16 @@
   max-width: 480px;
   margin-bottom: 16px;
 }
+
+.magic-item-edit__layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.magic-item-edit__preview {
+  position: sticky;
+  top: 16px;
+}
+

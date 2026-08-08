@@ -2,7 +2,17 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 480px;
+  max-width: 560px;
+}
+
+.magic-item-editor__row {
+  display: flex;
+  gap: 16px;
+}
+
+.magic-item-editor__row .magic-item-editor__field {
+  flex: 1;
+  min-width: 0;
 }
 
 .magic-item-editor__field {
@@ -11,6 +21,24 @@
   gap: 6px;
   font-size: 13px;
   color: var(--atlas-text-secondary);
+}
+
+.magic-item-editor__fieldset {
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  padding: 12px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.magic-item-editor__subform {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--atlas-border);
 }
 
 .magic-item-editor__field--inline {

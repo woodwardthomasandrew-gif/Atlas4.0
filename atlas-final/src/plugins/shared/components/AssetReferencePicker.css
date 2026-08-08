@@ -1,0 +1,14 @@
+.asset-reference-picker__select {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.asset-reference-picker__note {
+  font-size: 12px;
+  color: var(--atlas-text-secondary);
+  margin: 0;
+}

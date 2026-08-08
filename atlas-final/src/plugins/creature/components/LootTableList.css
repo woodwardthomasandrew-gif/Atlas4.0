@@ -1,0 +1,53 @@
+.loot-table-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loot-table-list__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  padding: 10px;
+}
+
+.loot-table-list__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.loot-table-list__name,
+.loot-table-list__ref-name {
+  flex: 1;
+  font-size: 13px;
+}
+
+.loot-table-list__variance {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.loot-table-list__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--atlas-text-secondary);
+  max-width: 80px;
+}
+
+.loot-table-list__notes {
+  flex: 1;
+  min-width: 120px;
+}
+
+.loot-table-list__add-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

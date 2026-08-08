@@ -1,0 +1,23 @@
+.ability-score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ability-score-grid__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--atlas-text-secondary);
+  position: relative;
+}
+
+.ability-score-grid__modifier {
+  position: absolute;
+  right: 8px;
+  top: 26px;
+  font-size: 12px;
+  color: var(--atlas-text-secondary);
+  pointer-events: none;
+}

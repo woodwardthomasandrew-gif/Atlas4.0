@@ -1,0 +1,27 @@
+.sense-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+}
+
+.sense-row__label {
+  min-width: 100px;
+}
+
+.sense-row__auto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.sense-row__value {
+  max-width: 90px;
+}
+
+.sense-row__calculated {
+  color: var(--atlas-text-primary);
+  font-size: 13px;
+}

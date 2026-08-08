@@ -36,6 +36,12 @@ export async function getAssetCount(): Promise<number> {
   return rows[0]?.count ?? 0;
 }
 
+export async function getAsset(id: string): Promise<AssetRecord | null> {
+  const rows = (await window.atlas.db.query("SELECT * FROM assets WHERE id = ?", [id])) as AssetRow[];
+  const row = rows[0];
+  return row ? rowToRecord(row) : null;
+}
+
 export async function listAssets(type?: string): Promise<AssetRecord[]> {
   const rows = type
     ? ((await window.atlas.db.query(

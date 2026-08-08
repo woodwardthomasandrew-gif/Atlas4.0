@@ -1,0 +1,49 @@
+.spell-edit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.spell-edit__header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.spell-edit__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.spell-edit__errors {
+  border-color: var(--atlas-danger);
+  color: var(--atlas-danger);
+  margin-bottom: 16px;
+}
+
+.spell-edit__errors p {
+  margin: 0;
+}
+
+.spell-edit__name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+  max-width: 480px;
+  margin-bottom: 16px;
+}
+
+.spell-edit__layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.spell-edit__preview {
+  position: sticky;
+  top: 16px;
+}

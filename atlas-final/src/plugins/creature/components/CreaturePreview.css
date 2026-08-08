@@ -1,0 +1,64 @@
+.creature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 380px;
+  background: var(--atlas-surface-raised);
+  border: 2px solid #b23a2f;
+  border-radius: var(--atlas-radius-md, 10px);
+  padding: 16px 18px;
+  font-size: 13px;
+  color: var(--atlas-text-primary);
+}
+
+.creature-card p {
+  margin: 2px 0;
+}
+
+.creature-card__artwork {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--atlas-radius-sm);
+  margin-bottom: 8px;
+}
+
+.creature-card__header {
+  margin-bottom: 4px;
+}
+
+.creature-card__name {
+  margin: 0;
+  font-size: 20px;
+  color: #b23a2f;
+  font-family: serif;
+}
+
+.creature-card__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--atlas-text-secondary);
+}
+
+.creature-card__divider {
+  height: 2px;
+  background: linear-gradient(to right, #b23a2f, transparent);
+  margin: 6px 0;
+}
+
+.creature-card__abilities {
+  font-family: var(--atlas-font-mono);
+  font-size: 12px;
+}
+
+.creature-card__section-title {
+  font-size: 14px;
+  color: #b23a2f;
+  border-bottom: 1px solid #b23a2f;
+  margin: 10px 0 4px;
+}
+
+.creature-card__entry {
+  line-height: 1.4;
+}

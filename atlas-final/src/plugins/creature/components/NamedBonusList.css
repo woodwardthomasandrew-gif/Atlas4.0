@@ -1,0 +1,20 @@
+.named-bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.named-bonus-list__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.named-bonus-list__name {
+  flex: 2;
+}
+
+.named-bonus-list__bonus {
+  flex: 1;
+  max-width: 90px;
+}

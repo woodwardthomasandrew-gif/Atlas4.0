@@ -1,5 +1,7 @@
 import type { AssetExporter } from "@app/plugin-api/types";
 import type { MagicItemData } from "./schema";
+import { describeDamage, formatChargesLine } from "./cardText";
+import { renderItemCardToPng } from "./cardRenderer";
 
 const jsonExporter: AssetExporter<MagicItemData> = {
   id: "json",
@@ -16,14 +18,46 @@ const markdownExporter: AssetExporter<MagicItemData> = {
   fileExtension: "md",
   export: async (data, name) => {
     const attunement = data.requiresAttunement ? " (requires attunement)" : "";
-    return [
+    const lines = [
       `# ${name}`,
       "",
       `*${data.itemType}, ${data.rarity}${attunement}*`,
       "",
-      data.description
-    ].join("\n");
+      `Weight: ${data.weightLb} lb   Value: ${data.valueGp} gp`,
+      ""
+    ];
+
+    if (data.flavorText.trim().length > 0) {
+      lines.push(`_${data.flavorText}_`, "");
+    }
+
+    if (data.mechanicalText.trim().length > 0) {
+      lines.push(data.mechanicalText, "");
+    }
+
+    if (data.hasCharges) {
+      lines.push("**Charges**", formatChargesLine(data.charges), "");
+    }
+
+    if (data.hasDamage) {
+      lines.push("**Damage**", describeDamage(data.damage), "");
+    }
+
+    return lines.join("\n");
   }
 };
 
-export const magicItemExporters: AssetExporter<MagicItemData>[] = [jsonExporter, markdownExporter];
+const pngExporter: AssetExporter<MagicItemData> = {
+  id: "png",
+  label: "PNG Card",
+  fileExtension: "png",
+  export: async (data, name) => {
+    return renderItemCardToPng(name, data);
+  }
+};
+
+export const magicItemExporters: AssetExporter<MagicItemData>[] = [
+  pngExporter,
+  jsonExporter,
+  markdownExporter
+];

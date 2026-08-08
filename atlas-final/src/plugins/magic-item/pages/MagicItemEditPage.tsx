@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
-import { MAGIC_ITEM_TYPE, type MagicItemData } from "../schema";
+import { MAGIC_ITEM_TYPE, normalizeMagicItemData, type MagicItemData } from "../schema";
 import "./MagicItemEditPage.css";
 
 function generateId(): string {
@@ -36,7 +36,7 @@ export function MagicItemEditPage(): JSX.Element {
         const row = (rows as Array<{ name: string; data: string }>)[0];
         if (row) {
           setName(row.name);
-          setData(JSON.parse(row.data));
+          setData(normalizeMagicItemData(JSON.parse(row.data)));
         }
         setLoaded(true);
       });
@@ -67,7 +67,8 @@ export function MagicItemEditPage(): JSX.Element {
     const exporter = definition.exporters.find((e) => e.id === exporterId);
     if (!exporter) return;
     const output = await exporter.export(data, name);
-    const blob = new Blob([output as BlobPart], { type: "text/plain" });
+    const mimeType = exporter.fileExtension === "png" ? "image/png" : "text/plain";
+    const blob = new Blob([output as BlobPart], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -82,6 +83,11 @@ export function MagicItemEditPage(): JSX.Element {
     assetId: string | null;
     data: MagicItemData;
     onChange: (data: MagicItemData) => void;
+  }>;
+
+  const Preview = definition.preview as ComponentType<{
+    name: string;
+    data: MagicItemData;
   }>;
 
   return (
@@ -119,7 +125,12 @@ export function MagicItemEditPage(): JSX.Element {
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Item name" />
       </label>
 
-      <Editor assetId={isNew ? null : assetId} data={data} onChange={setData} />
+      <div className="magic-item-edit__layout">
+        <Editor assetId={isNew ? null : assetId} data={data} onChange={setData} />
+        <div className="magic-item-edit__preview">
+          <Preview name={name} data={data} />
+        </div>
+      </div>
     </div>
   );
 }

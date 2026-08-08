@@ -1,0 +1,20 @@
+.placed-card {
+  position: absolute;
+  cursor: grab;
+  box-sizing: border-box;
+  outline: 1px dashed transparent;
+}
+
+.placed-card:active {
+  cursor: grabbing;
+}
+
+.placed-card--selected {
+  outline: 2px solid var(--atlas-accent);
+}
+
+.placed-card__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

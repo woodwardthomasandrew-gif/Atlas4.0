@@ -10,6 +10,7 @@ import {
 } from "./schema";
 import { validateMagicItem } from "./validate";
 import { magicItemExporters } from "./exporters";
+import { renderItemCard } from "./cardRenderer";
 import { MagicItemEditor } from "./components/MagicItemEditor";
 import { MagicItemPreview } from "./components/MagicItemPreview";
 import { MagicItemListPage } from "./pages/MagicItemListPage";
@@ -26,7 +27,9 @@ const magicItemDefinition: AssetTypeDefinition<MagicItemData> = {
   preview: MagicItemPreview,
   validate: validateMagicItem,
   exporters: magicItemExporters,
-  createDefaultData: createDefaultMagicItemData
+  createDefaultData: createDefaultMagicItemData,
+  renderCardToCanvas: renderItemCard,
+  cardSize: { widthIn: 2.5, heightIn: 3.5 }
 };
 
 export function registerMagicItemPlugin(): void {

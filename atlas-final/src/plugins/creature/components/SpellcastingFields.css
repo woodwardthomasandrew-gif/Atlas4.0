@@ -1,0 +1,70 @@
+.spellcasting-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spellcasting-fields__enable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+}
+
+.spellcasting-fields__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--atlas-border);
+}
+
+.spellcasting-fields__row {
+  display: flex;
+  gap: 10px;
+}
+
+.spellcasting-fields__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--atlas-text-secondary);
+  flex: 1;
+}
+
+.spellcasting-fields__field select,
+.spellcasting-fields__field textarea {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.spellcasting-fields__refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.spellcasting-fields__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--atlas-accent-muted);
+  border-radius: 999px;
+  padding: 3px 6px 3px 10px;
+  font-size: 12px;
+}
+
+.spellcasting-fields__chip button {
+  background: none;
+  border: none;
+  color: var(--atlas-text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+}

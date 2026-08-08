@@ -1,0 +1,48 @@
+.placement-inspector {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  padding: 12px;
+  background: var(--atlas-surface-raised);
+}
+
+.placement-inspector h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placement-inspector__row {
+  display: flex;
+  gap: 8px;
+}
+
+.placement-inspector label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--atlas-text-secondary);
+  flex: 1;
+}
+
+.placement-inspector__rotation {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--atlas-text-secondary);
+}
+
+.placement-inspector__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}

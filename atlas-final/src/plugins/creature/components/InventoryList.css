@@ -1,0 +1,36 @@
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inventory-list__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inventory-list__name {
+  flex: 2;
+}
+
+.inventory-list__ref-name {
+  flex: 2;
+  font-size: 13px;
+  color: var(--atlas-text-primary);
+}
+
+.inventory-list__quantity {
+  flex: 1;
+  max-width: 80px;
+}
+
+.inventory-list__notes {
+  flex: 2;
+}
+
+.inventory-list__add-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

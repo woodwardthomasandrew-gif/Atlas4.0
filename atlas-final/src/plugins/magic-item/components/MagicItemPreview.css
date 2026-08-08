@@ -1,21 +1,102 @@
-.magic-item-preview {
+.magic-item-card {
+  --rarity-color: var(--atlas-text-secondary);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  max-width: 360px;
 }
 
-.magic-item-preview__meta {
+.magic-item-card__frame {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  background: var(--atlas-surface-raised);
+  border: 2px solid var(--rarity-color);
+  border-radius: var(--atlas-radius-md, 10px);
+  padding: 16px 18px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15) inset;
+}
+
+.magic-item-card__header {
+  border-bottom: 1px solid var(--rarity-color);
+  padding-bottom: 8px;
+}
+
+.magic-item-card__name {
+  margin: 0;
+  font-size: 18px;
+  color: var(--rarity-color);
+}
+
+.magic-item-card__subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--atlas-text-secondary);
+}
+
+.magic-item-card__meta {
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.magic-item-preview__type {
+.magic-item-card__stats {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
   color: var(--atlas-text-secondary);
-  font-style: italic;
-  margin: 0;
 }
 
-.magic-item-preview__description {
+.magic-item-card__flavor {
+  margin: 0;
+  font-style: italic;
+  color: var(--atlas-text-secondary);
+  white-space: pre-wrap;
+}
+
+.magic-item-card__mechanics {
   margin: 0;
   white-space: pre-wrap;
 }
+
+.magic-item-card__section {
+  border-top: 1px dashed var(--atlas-border);
+  padding-top: 8px;
+}
+
+.magic-item-card__section h3 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--atlas-text-secondary);
+}
+
+.magic-item-card__section p {
+  margin: 0;
+}
+
+.magic-item-card--common {
+  --rarity-color: #9a9ba3;
+}
+
+.magic-item-card--uncommon {
+  --rarity-color: #4caf50;
+}
+
+.magic-item-card--rare {
+  --rarity-color: #5b8def;
+}
+
+.magic-item-card--very-rare {
+  --rarity-color: #9b5bef;
+}
+
+.magic-item-card--legendary {
+  --rarity-color: #e5a339;
+}
+
+.magic-item-card--artifact {
+  --rarity-color: #e5484d;
+}
+

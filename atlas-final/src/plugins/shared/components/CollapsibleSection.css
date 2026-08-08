@@ -1,0 +1,38 @@
+.collapsible-section {
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  overflow: hidden;
+}
+
+.collapsible-section__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--atlas-surface-raised);
+  border: none;
+  color: var(--atlas-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.collapsible-section__chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--atlas-text-secondary);
+}
+
+.collapsible-section__chevron--open {
+  transform: rotate(90deg);
+}
+
+.collapsible-section__body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 1px solid var(--atlas-border);
+}

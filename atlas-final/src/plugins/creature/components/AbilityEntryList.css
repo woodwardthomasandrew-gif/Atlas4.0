@@ -1,0 +1,83 @@
+.ability-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ability-entry-list__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  padding: 10px;
+}
+
+.ability-entry-list__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ability-entry-list__name {
+  flex: 1;
+}
+
+.ability-entry-list__description {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.ability-entry-list__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--atlas-text-secondary);
+}
+
+.ability-entry-list__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  padding-top: 6px;
+  border-top: 1px dashed var(--atlas-border);
+}
+
+.ability-entry-list__stat-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--atlas-text-secondary);
+  min-width: 70px;
+}
+
+.ability-entry-list__stat-field--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.ability-entry-list__damage-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.ability-entry-list__damage-row select,
+.ability-entry-list__damage-row input {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 6px 8px;
+  font-size: 12px;
+}

@@ -41,6 +41,7 @@ export interface AssetEditorProps<TData = unknown> {
 
 /** Props passed to a plugin-supplied preview component. */
 export interface AssetPreviewProps<TData = unknown> {
+  name: string;
   data: TData;
 }
 
@@ -50,6 +51,12 @@ export interface AssetExporter<TData = unknown> {
   label: string;
   fileExtension: string;
   export: (data: TData, name: string) => Promise<string | Uint8Array>;
+}
+
+/** Default physical size, in inches, a card for this asset type should be placed at. */
+export interface CardSize {
+  widthIn: number;
+  heightIn: number;
 }
 
 /**
@@ -69,4 +76,14 @@ export interface AssetTypeDefinition<TData = unknown> {
   validate: (data: TData) => ValidationResult;
   exporters: AssetExporter<TData>[];
   createDefaultData: () => TData;
+  /**
+   * Optional: draws this asset's card onto a canvas at whatever resolution
+   * the canvas is already sized to. Consumers (like Print Studio) size the
+   * canvas first, then call this to fill it — the same function each
+   * plugin's own PNG exporter already uses internally. Asset types that
+   * don't supply this simply can't be placed in Print Studio layouts.
+   */
+  renderCardToCanvas?: (canvas: HTMLCanvasElement, name: string, data: TData) => void;
+  /** Default placement size for this asset type's card. Required if renderCardToCanvas is set. */
+  cardSize?: CardSize;
 }

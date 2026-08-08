@@ -1,0 +1,22 @@
+.spell-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.spell-list__header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.spell-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.spell-list__card-link {
+  text-decoration: none;
+  color: inherit;
+}

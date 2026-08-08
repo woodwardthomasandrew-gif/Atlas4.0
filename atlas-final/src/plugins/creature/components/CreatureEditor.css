@@ -1,0 +1,103 @@
+.creature-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.creature-editor__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.creature-editor__section h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--atlas-text-secondary);
+  margin: 0;
+}
+
+.creature-editor__advanced-heading {
+  font-size: 15px;
+  margin: 8px 0 0;
+  border-top: 1px solid var(--atlas-border);
+  padding-top: 16px;
+}
+
+.creature-editor__row {
+  display: flex;
+  gap: 14px;
+}
+
+.creature-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--atlas-text-secondary);
+  flex: 1;
+  min-width: 0;
+}
+
+.creature-editor__field select {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.creature-editor__xp-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.creature-editor__xp-row select {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 8px 10px;
+}
+
+.creature-editor__calculated {
+  font-size: 13px;
+  color: var(--atlas-text-primary);
+}
+
+.creature-editor__speed-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.creature-editor__speed-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--atlas-text-secondary);
+  max-width: 90px;
+}
+
+.creature-editor__senses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.creature-editor__textarea {
+  background: var(--atlas-surface-raised);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-primary);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}

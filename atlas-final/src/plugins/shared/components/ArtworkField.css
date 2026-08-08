@@ -1,0 +1,35 @@
+.artwork-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.artwork-field__preview {
+  width: 100%;
+  max-width: 240px;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: var(--atlas-radius-sm);
+  border: 1px solid var(--atlas-border);
+}
+
+.artwork-field__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.artwork-field__remove {
+  background: none;
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-text-secondary);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.artwork-field__remove:hover {
+  border-color: var(--atlas-danger);
+  color: var(--atlas-danger);
+}
