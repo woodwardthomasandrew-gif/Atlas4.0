@@ -2,6 +2,7 @@ import { useEffect, useState, type ComponentType } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
+import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { CREATURE_TYPE, normalizeCreatureData, type CreatureData } from "../schema";
 import "./CreatureEditPage.css";
@@ -93,6 +94,9 @@ export function CreatureEditPage(): JSX.Element {
       <header className="creature-edit__header">
         <h1>{isNew ? "New Creature" : "Edit Creature"}</h1>
         <div className="creature-edit__actions">
+          {!isNew && (
+            <DuplicateAssetButton assetId={assetId} basePath="/creatures" />
+          )}
           {!isNew && (
             <Button variant="danger" onClick={handleDelete}>
               Delete

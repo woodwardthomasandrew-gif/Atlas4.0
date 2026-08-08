@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, EmptyState } from "@ui/components";
 import { listAssets, type AssetRecord } from "@app/db/assetStore";
+import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { MAGIC_ITEM_TYPE } from "../schema";
 import "./MagicItemListPage.css";
 
@@ -34,8 +35,14 @@ export function MagicItemListPage(): JSX.Element {
         <div className="magic-item-list__grid">
           {items.map((item) => (
             <Link key={item.id} to={`/magic-items/${item.id}`} className="magic-item-list__card-link">
-              <Card>
+              <Card className="magic-item-list__card">
                 <strong>{item.name}</strong>
+                <DuplicateAssetButton
+                  assetId={item.id}
+                  basePath="/magic-items"
+                  variant="ghost"
+                  className="magic-item-list__duplicate"
+                />
               </Card>
             </Link>
           ))}

@@ -289,7 +289,12 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
       {/* Traits & Actions */}
       <section className="creature-editor__section">
         <h2>Traits</h2>
-        <AbilityEntryList value={data.traits} onChange={(v) => update("traits", v)} addLabel="Add Trait" />
+        <AbilityEntryList
+          value={data.traits}
+          onChange={(v) => update("traits", v)}
+          addLabel="Add Trait"
+          componentType="trait"
+        />
       </section>
 
       <section className="creature-editor__section">
@@ -298,6 +303,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.actions}
           onChange={(v) => update("actions", v)}
           addLabel="Add Action"
+          componentType="action"
         />
       </section>
 
@@ -309,6 +315,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.bonusActions}
           onChange={(v) => update("bonusActions", v)}
           addLabel="Add Bonus Action"
+          componentType="bonusAction"
         />
       </CollapsibleSection>
 
@@ -317,6 +324,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.reactions}
           onChange={(v) => update("reactions", v)}
           addLabel="Add Reaction"
+          componentType="reaction"
         />
       </CollapsibleSection>
 
@@ -325,6 +333,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.legendaryActions}
           onChange={(v) => update("legendaryActions", v)}
           addLabel="Add Legendary Action"
+          componentType="legendaryAction"
         />
       </CollapsibleSection>
 
@@ -333,6 +342,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.lairActions}
           onChange={(v) => update("lairActions", v)}
           addLabel="Add Lair Action"
+          componentType="lairAction"
         />
       </CollapsibleSection>
 
@@ -341,6 +351,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
           value={data.mythicActions}
           onChange={(v) => update("mythicActions", v)}
           addLabel="Add Mythic Action"
+          componentType="mythicAction"
         />
       </CollapsibleSection>
 

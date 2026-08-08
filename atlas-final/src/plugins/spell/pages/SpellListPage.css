@@ -20,3 +20,19 @@
   text-decoration: none;
   color: inherit;
 }
+
+.spell-list__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spell-list__duplicate {
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.spell-list__card:hover .spell-list__duplicate {
+  opacity: 1;
+}

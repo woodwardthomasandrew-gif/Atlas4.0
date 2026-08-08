@@ -74,3 +74,40 @@ export async function saveAsset(record: {
 export async function deleteAsset(id: string): Promise<void> {
   await window.atlas.db.run("DELETE FROM assets WHERE id = ?", [id]);
 }
+
+/**
+ * Generic duplication (Atlas 4.0 Part 2). Works for any registered asset
+ * type — creature, item, spell, or anything future — because it operates
+ * purely on the generic asset row shape: new UUID, new row, a structurally
+ * cloned `data` blob. Nothing here knows what a creature or a spell is.
+ *
+ * The clone is a deep structural copy (via JSON round-trip, which is safe
+ * since `data` is itself always JSON-serializable), so editing the
+ * duplicate can never mutate the original's data, including nested
+ * component copies inside arrays like traits/actions.
+ */
+export async function duplicateAsset(
+  id: string,
+  nameSuffix = " (Copy)"
+): Promise<AssetRecord> {
+  const original = await getAsset(id);
+  if (!original) {
+    throw new Error(`Cannot duplicate: asset "${id}" not found.`);
+  }
+
+  const newId = crypto.randomUUID();
+  const clonedData = JSON.parse(JSON.stringify(original.data));
+
+  await saveAsset({
+    id: newId,
+    type: original.type,
+    name: `${original.name}${nameSuffix}`,
+    data: clonedData
+  });
+
+  const created = await getAsset(newId);
+  if (!created) {
+    throw new Error("Duplicate was saved but could not be reloaded.");
+  }
+  return created;
+}

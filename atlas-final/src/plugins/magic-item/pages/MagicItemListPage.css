@@ -20,3 +20,19 @@
   text-decoration: none;
   color: inherit;
 }
+
+.magic-item-list__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.magic-item-list__duplicate {
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.magic-item-list__card:hover .magic-item-list__duplicate {
+  opacity: 1;
+}

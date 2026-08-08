@@ -2,6 +2,7 @@ import { useEffect, useState, type ComponentType } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
+import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { MAGIC_ITEM_TYPE, normalizeMagicItemData, type MagicItemData } from "../schema";
 import "./MagicItemEditPage.css";
@@ -95,6 +96,9 @@ export function MagicItemEditPage(): JSX.Element {
       <header className="magic-item-edit__header">
         <h1>{isNew ? "New Magic Item" : "Edit Magic Item"}</h1>
         <div className="magic-item-edit__actions">
+          {!isNew && (
+            <DuplicateAssetButton assetId={assetId} basePath="/magic-items" />
+          )}
           {!isNew && (
             <Button variant="danger" onClick={handleDelete}>
               Delete

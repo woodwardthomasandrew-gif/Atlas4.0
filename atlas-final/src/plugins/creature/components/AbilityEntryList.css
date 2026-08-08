@@ -81,3 +81,23 @@
   padding: 6px 8px;
   font-size: 12px;
 }
+
+.ability-entry-list__save-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 8px;
+  background: var(--atlas-surface-raised);
+  border: 1px dashed var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+}
+
+.ability-entry-list__save-form .ability-entry-list__stat-field {
+  min-width: 160px;
+}
+
+.ability-entry-list__add-row {
+  display: flex;
+  gap: 8px;
+}

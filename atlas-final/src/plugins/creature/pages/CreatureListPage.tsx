@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, EmptyState } from "@ui/components";
 import { listAssets, type AssetRecord } from "@app/db/assetStore";
+import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { CREATURE_TYPE } from "../schema";
 import "./CreatureListPage.css";
 
@@ -31,8 +32,14 @@ export function CreatureListPage(): JSX.Element {
         <div className="creature-list__grid">
           {items.map((item) => (
             <Link key={item.id} to={`/creatures/${item.id}`} className="creature-list__card-link">
-              <Card>
+              <Card className="creature-list__card">
                 <strong>{item.name}</strong>
+                <DuplicateAssetButton
+                  assetId={item.id}
+                  basePath="/creatures"
+                  variant="ghost"
+                  className="creature-list__duplicate"
+                />
               </Card>
             </Link>
           ))}

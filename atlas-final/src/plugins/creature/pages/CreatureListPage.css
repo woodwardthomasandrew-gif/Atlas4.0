@@ -20,3 +20,19 @@
   text-decoration: none;
   color: inherit;
 }
+
+.creature-list__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.creature-list__duplicate {
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.creature-list__card:hover .creature-list__duplicate {
+  opacity: 1;
+}

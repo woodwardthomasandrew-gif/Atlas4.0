@@ -2,6 +2,7 @@ import { useEffect, useState, type ComponentType } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
+import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { SPELL_TYPE, normalizeSpellData, type SpellData } from "../schema";
 import "./SpellEditPage.css";
@@ -93,6 +94,9 @@ export function SpellEditPage(): JSX.Element {
       <header className="spell-edit__header">
         <h1>{isNew ? "New Spell" : "Edit Spell"}</h1>
         <div className="spell-edit__actions">
+          {!isNew && (
+            <DuplicateAssetButton assetId={assetId} basePath="/spells" />
+          )}
           {!isNew && (
             <Button variant="danger" onClick={handleDelete}>
               Delete

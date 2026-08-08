@@ -1,0 +1,60 @@
+.atlas-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 16px 16px;
+  z-index: 1000;
+}
+
+.atlas-modal {
+  background: var(--atlas-surface);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-md);
+  width: 420px;
+  max-width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.atlas-modal--wide {
+  width: 640px;
+}
+
+.atlas-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--atlas-border);
+}
+
+.atlas-modal__header h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.atlas-modal__close {
+  background: none;
+  border: none;
+  color: var(--atlas-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--atlas-radius-sm);
+}
+
+.atlas-modal__close:hover {
+  background: var(--atlas-surface-raised);
+  color: var(--atlas-text-primary);
+}
+
+.atlas-modal__body {
+  padding: 16px;
+  overflow-y: auto;
+}
