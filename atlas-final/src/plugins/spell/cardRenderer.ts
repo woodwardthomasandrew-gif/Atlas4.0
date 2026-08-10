@@ -103,6 +103,41 @@ function drawLabeledLine(
   return cursorY + lineHeight;
 }
 
+/** Counts wrapped lines a labeled line ("**Label** rest...") will take, matching drawLabeledLine's wrap rule exactly. */
+function countLabeledLineLines(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  rest: string,
+  maxWidth: number
+): number {
+  const font = "13px sans-serif";
+  const boldFont = "bold 13px sans-serif";
+  const words = [{ text: `${label} `, bold: true }, ...rest.split(" ").map((w) => ({ text: `${w} `, bold: false }))];
+
+  let cursorX = 0;
+  let lines = 1;
+  for (const word of words) {
+    ctx.font = word.bold ? boldFont : font;
+    const width = ctx.measureText(word.text).width;
+    if (cursorX + width > maxWidth && cursorX > 0) {
+      cursorX = 0;
+      lines += 1;
+    }
+    cursorX += width;
+  }
+  return lines;
+}
+
+function measureLabeledLineHeight(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  rest: string,
+  maxWidth: number,
+  lineHeight: number
+): number {
+  return countLabeledLineLines(ctx, label, rest, maxWidth) * lineHeight;
+}
+
 function drawDivider(ctx: CanvasRenderingContext2D, y: number): void {
   ctx.save();
   ctx.strokeStyle = ACCENT;
@@ -130,7 +165,16 @@ export function renderSpellCard(canvas: HTMLCanvasElement, name: string, rawData
   y += 30; // name
   y += 20; // subtitle
   y += 16;
-  y += lineHeight * 4; // casting time / range / components / duration
+  y += measureLabeledLineHeight(measureCtx, "Casting Time", data.castingTime, CONTENT_WIDTH, lineHeight);
+  y += measureLabeledLineHeight(measureCtx, "Range", data.range, CONTENT_WIDTH, lineHeight);
+  y += measureLabeledLineHeight(
+    measureCtx,
+    "Components",
+    formatComponentsLine(data.components),
+    CONTENT_WIDTH,
+    lineHeight
+  );
+  y += measureLabeledLineHeight(measureCtx, "Duration", data.duration, CONTENT_WIDTH, lineHeight);
   y += 16;
   y += wrapLines(measureCtx, data.description, {
     font: "13px sans-serif",
@@ -139,10 +183,18 @@ export function renderSpellCard(canvas: HTMLCanvasElement, name: string, rawData
     lineHeight
   }).length * lineHeight;
   y += 8;
-  if (damageHealingLine) y += lineHeight;
-  if (areaLine) y += lineHeight;
-  if (data.conditionsApplied.length > 0) y += lineHeight;
-  if (resolutionLine) y += lineHeight;
+  if (damageHealingLine) y += measureLabeledLineHeight(measureCtx, "Effect", damageHealingLine, CONTENT_WIDTH, lineHeight);
+  if (areaLine) y += measureLabeledLineHeight(measureCtx, "Area", areaLine, CONTENT_WIDTH, lineHeight);
+  if (data.conditionsApplied.length > 0) {
+    y += measureLabeledLineHeight(
+      measureCtx,
+      "Conditions",
+      data.conditionsApplied.join(", "),
+      CONTENT_WIDTH,
+      lineHeight
+    );
+  }
+  if (resolutionLine) y += measureLabeledLineHeight(measureCtx, "Resolution", resolutionLine, CONTENT_WIDTH, lineHeight);
   if (data.scaling.canUpcast && data.scaling.description) {
     y += 24;
     y += wrapLines(measureCtx, data.scaling.description, {
@@ -152,7 +204,9 @@ export function renderSpellCard(canvas: HTMLCanvasElement, name: string, rawData
       lineHeight
     }).length * lineHeight;
   }
-  if (data.classes.length > 0) y += lineHeight;
+  if (data.classes.length > 0) {
+    y += 4 + lineHeight; // matches the draw pass's single-line (unwrapped) classes text
+  }
   y += MARGIN;
 
   const cardHeight = Math.max(y, 380);

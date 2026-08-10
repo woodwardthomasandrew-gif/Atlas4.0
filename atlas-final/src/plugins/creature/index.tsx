@@ -5,7 +5,7 @@ import { registerRoutes } from "@app/routes/routeRegistry";
 import { CREATURE_TYPE, creatureSchema, createDefaultCreatureData, type CreatureData } from "./schema";
 import { validateCreature } from "./validate";
 import { creatureExporters } from "./exporters";
-import { renderCreatureCard } from "./cardRenderer";
+import { renderCreatureCard, renderCreatureCardToCanvases } from "./cardRenderer";
 import { CreatureEditor } from "./components/CreatureEditor";
 import { CreaturePreview } from "./components/CreaturePreview";
 import { CreatureListPage } from "./pages/CreatureListPage";
@@ -24,6 +24,7 @@ const creatureDefinition: AssetTypeDefinition<CreatureData> = {
   exporters: creatureExporters,
   createDefaultData: createDefaultCreatureData,
   renderCardToCanvas: renderCreatureCard,
+  renderCardToCanvases: renderCreatureCardToCanvases,
   cardSize: { widthIn: 5, heightIn: 7 }
 };
 

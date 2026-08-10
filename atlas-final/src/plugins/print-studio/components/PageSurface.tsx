@@ -52,19 +52,33 @@ export function PageSurface({
 
     if (payload.kind !== "new") return;
 
-    const newPlacement: CardPlacement = {
-      id: crypto.randomUUID(),
-      assetType: payload.assetType,
-      assetId: payload.assetId,
-      name: payload.name,
-      xIn: clamp(dropXIn - payload.widthIn / 2, 0, dims.widthIn - payload.widthIn),
-      yIn: clamp(dropYIn - payload.heightIn / 2, 0, dims.heightIn - payload.heightIn),
-      widthIn: payload.widthIn,
-      heightIn: payload.heightIn,
-      rotationDeg: 0
-    };
-    onChangePlacements([...page.placements, newPlacement]);
-    onSelect(newPlacement.id);
+    // Multi-page assets (e.g. a creature whose stat block spans several
+    // cards) drop as a vertical stack of separate placements, each sized
+    // to its own page's real content instead of one guessed box.
+    const GAP_IN = 0.25;
+    const newPlacements: CardPlacement[] = [];
+    let stackYIn = dropYIn - payload.pages[0].heightIn / 2;
+
+    for (const page_ of payload.pages) {
+      const xIn = clamp(dropXIn - page_.widthIn / 2, 0, Math.max(0, dims.widthIn - page_.widthIn));
+      const yIn = clamp(stackYIn, 0, Math.max(0, dims.heightIn - page_.heightIn));
+      newPlacements.push({
+        id: crypto.randomUUID(),
+        assetType: payload.assetType,
+        assetId: payload.assetId,
+        name: payload.name,
+        xIn,
+        yIn,
+        widthIn: page_.widthIn,
+        heightIn: page_.heightIn,
+        rotationDeg: 0,
+        cardPageIndex: page_.cardPageIndex
+      });
+      stackYIn = yIn + page_.heightIn + GAP_IN;
+    }
+
+    onChangePlacements([...page.placements, ...newPlacements]);
+    onSelect(newPlacements[newPlacements.length - 1]?.id ?? null);
   };
 
   return (

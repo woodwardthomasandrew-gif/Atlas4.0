@@ -3,7 +3,6 @@ import { normalizeMagicItemData } from "./schema";
 import { describeDamage, formatChargesLine } from "./cardText";
 
 const CARD_WIDTH = 600;
-const CARD_HEIGHT = 840;
 const MARGIN = 32;
 const CONTENT_WIDTH = CARD_WIDTH - MARGIN * 2;
 
@@ -130,10 +129,72 @@ function roundRect(
   ctx.closePath();
 }
 
+/** Counts wrapped lines without drawing, using the exact same wrap rule as drawWrappedText. */
+function countWrappedLines(ctx: CanvasRenderingContext2D, text: string, font: string, maxWidth: number): number {
+  ctx.font = font;
+  let lines = 0;
+  for (const paragraph of text.split("\n")) {
+    if (paragraph.trim().length === 0) {
+      lines += 1;
+      continue;
+    }
+    const words = paragraph.split(" ");
+    let line = "";
+    for (const word of words) {
+      const testLine = line.length === 0 ? word : `${line} ${word}`;
+      if (ctx.measureText(testLine).width > maxWidth && line.length > 0) {
+        lines += 1;
+        line = word;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.length > 0) lines += 1;
+  }
+  return lines;
+}
+
 export function renderItemCard(canvas: HTMLCanvasElement, name: string, rawData: MagicItemData): void {
   const data = normalizeMagicItemData(rawData);
+  const measureCanvas = document.createElement("canvas");
+  const measureCtx = measureCanvas.getContext("2d");
+  if (!measureCtx) throw new Error("Canvas 2D context is not available.");
+
+  // Measuring pass: content (flavor/mechanical text, charges, damage) is
+  // free-form and can run long, so the canvas must be sized to what will
+  // actually be drawn rather than a fixed height — a fixed height meant
+  // long items simply had their bottom sections drawn off-canvas.
+  let measuredY = MARGIN + 8;
+  measuredY += 34; // name
+  measuredY += 28; // subtitle
+  measuredY += 16; // divider gap
+  measuredY += 22 + 14; // badges row
+  measuredY += 26; // weight/value line
+  measuredY += 16; // divider gap
+
+  if (data.flavorText.trim().length > 0) {
+    measuredY += countWrappedLines(measureCtx, data.flavorText, "italic 14px serif", CONTENT_WIDTH) * 20;
+    measuredY += 12;
+  }
+  if (data.mechanicalText.trim().length > 0) {
+    measuredY += countWrappedLines(measureCtx, data.mechanicalText, "15px sans-serif", CONTENT_WIDTH) * 21;
+    measuredY += 12;
+  }
+  if (data.hasCharges) {
+    measuredY += 14 + 18; // divider + "CHARGES" label
+    measuredY += countWrappedLines(measureCtx, formatChargesLine(data.charges), "14px sans-serif", CONTENT_WIDTH) * 20;
+    measuredY += 8;
+  }
+  if (data.hasDamage) {
+    measuredY += 14 + 18; // divider + "DAMAGE" label
+    measuredY += countWrappedLines(measureCtx, describeDamage(data.damage), "14px sans-serif", CONTENT_WIDTH) * 20;
+  }
+  measuredY += MARGIN;
+
+  const cardHeight = Math.max(measuredY, 380);
+
   canvas.width = CARD_WIDTH;
-  canvas.height = CARD_HEIGHT;
+  canvas.height = cardHeight;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D context is not available.");
 
@@ -141,16 +202,16 @@ export function renderItemCard(canvas: HTMLCanvasElement, name: string, rawData:
 
   // Background
   ctx.fillStyle = BACKGROUND;
-  ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+  ctx.fillRect(0, 0, CARD_WIDTH, cardHeight);
 
   // Card frame
   ctx.fillStyle = SURFACE;
-  roundRect(ctx, 12, 12, CARD_WIDTH - 24, CARD_HEIGHT - 24, 12);
+  roundRect(ctx, 12, 12, CARD_WIDTH - 24, cardHeight - 24, 12);
   ctx.fill();
 
   ctx.lineWidth = 3;
   ctx.strokeStyle = rarityColor;
-  roundRect(ctx, 12, 12, CARD_WIDTH - 24, CARD_HEIGHT - 24, 12);
+  roundRect(ctx, 12, 12, CARD_WIDTH - 24, cardHeight - 24, 12);
   ctx.stroke();
 
   let y = MARGIN + 8;

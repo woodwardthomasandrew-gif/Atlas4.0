@@ -77,13 +77,26 @@ export interface AssetTypeDefinition<TData = unknown> {
   exporters: AssetExporter<TData>[];
   createDefaultData: () => TData;
   /**
-   * Optional: draws this asset's card onto a canvas at whatever resolution
-   * the canvas is already sized to. Consumers (like Print Studio) size the
-   * canvas first, then call this to fill it — the same function each
-   * plugin's own PNG exporter already uses internally. Asset types that
-   * don't supply this simply can't be placed in Print Studio layouts.
+   * Optional: draws this asset's card onto the given canvas, sizing the
+   * canvas itself to fit the content (content-driven asset types, like
+   * creature stat blocks, vary in height). Consumers must read the
+   * canvas's resulting width/height after calling this rather than
+   * assuming `cardSize` — that's only a starting/default size. Asset
+   * types that don't supply this simply can't be placed in Print Studio
+   * layouts.
    */
   renderCardToCanvas?: (canvas: HTMLCanvasElement, name: string, data: TData) => void;
-  /** Default placement size for this asset type's card. Required if renderCardToCanvas is set. */
+  /**
+   * Optional: like renderCardToCanvas, but for asset types whose content
+   * can exceed a single printable card (e.g. a creature with a very long
+   * stat block). Returns one canvas per physical card, in order, with
+   * continuation cards visually marked (e.g. "Name (cont.)"). Consumers
+   * that support multi-card placement (Print Studio) should prefer this
+   * over renderCardToCanvas when present; the first canvas in the
+   * returned array is equivalent to what renderCardToCanvas would draw
+   * when content fits on one card.
+   */
+  renderCardToCanvases?: (name: string, data: TData) => HTMLCanvasElement[];
+  /** Default/starting placement size for this asset type's card, in inches. Required if renderCardToCanvas is set. Actual placement height should be derived from the rendered canvas's real aspect ratio, not assumed to equal this. */
   cardSize?: CardSize;
 }

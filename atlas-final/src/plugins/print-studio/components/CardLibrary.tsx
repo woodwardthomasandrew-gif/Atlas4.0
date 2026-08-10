@@ -5,13 +5,55 @@ import "./CardLibrary.css";
 
 export const DRAG_MIME_TYPE = "application/x-atlas-card";
 
+/** One physical card's real size, derived from its actual rendered content rather than a guessed default. */
+export interface DraggedCardPage {
+  cardPageIndex: number;
+  widthIn: number;
+  heightIn: number;
+}
+
 export interface DraggedCardPayload {
   kind: "new";
   assetType: string;
   assetId: string;
   name: string;
-  widthIn: number;
-  heightIn: number;
+  /** One entry per physical card the asset renders to (usually 1; more for paginated content). */
+  pages: DraggedCardPage[];
+}
+
+/**
+ * Renders the asset (using the multi-card API when available) and measures
+ * each resulting canvas's true aspect ratio, so placements match what will
+ * actually be drawn instead of assuming every card matches the asset
+ * type's default cardSize. `cardSize.widthIn` is kept as the target design
+ * width; height is derived per-card from the real content.
+ */
+function measureCardPages(
+  definition: ReturnType<typeof getAllAssetTypes>[number],
+  record: AssetRecord
+): DraggedCardPage[] {
+  const widthIn = definition.cardSize?.widthIn ?? 5;
+
+  if (definition.renderCardToCanvases) {
+    const canvases = definition.renderCardToCanvases(record.name, record.data);
+    if (canvases.length > 0) {
+      return canvases.map((canvas, cardPageIndex) => ({
+        cardPageIndex,
+        widthIn,
+        heightIn: canvas.width > 0 ? widthIn * (canvas.height / canvas.width) : definition.cardSize?.heightIn ?? 7
+      }));
+    }
+  }
+
+  if (definition.renderCardToCanvas) {
+    const canvas = document.createElement("canvas");
+    definition.renderCardToCanvas(canvas, record.name, record.data);
+    if (canvas.width > 0) {
+      return [{ cardPageIndex: 0, widthIn, heightIn: widthIn * (canvas.height / canvas.width) }];
+    }
+  }
+
+  return [{ cardPageIndex: 0, widthIn, heightIn: definition.cardSize?.heightIn ?? 7 }];
 }
 
 function Thumbnail({ assetType, record }: { assetType: string; record: AssetRecord }): JSX.Element {
@@ -48,16 +90,17 @@ export function CardLibrary(): JSX.Element {
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
     assetType: string,
-    record: AssetRecord,
-    cardSize: { widthIn: number; heightIn: number }
+    record: AssetRecord
   ): void => {
+    const definition = placeableTypes.find((d) => d.type === assetType);
+    if (!definition) return;
+
     const payload: DraggedCardPayload = {
       kind: "new",
       assetType,
       assetId: record.id,
       name: record.name,
-      widthIn: cardSize.widthIn,
-      heightIn: cardSize.heightIn
+      pages: measureCardPages(definition, record)
     };
     e.dataTransfer.setData(DRAG_MIME_TYPE, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
@@ -83,9 +126,7 @@ export function CardLibrary(): JSX.Element {
                   key={record.id}
                   className="card-library__item"
                   draggable
-                  onDragStart={(e) =>
-                    handleDragStart(e, definition.type, record, definition.cardSize!)
-                  }
+                  onDragStart={(e) => handleDragStart(e, definition.type, record)}
                   title={record.name}
                 >
                   <Thumbnail assetType={definition.type} record={record} />

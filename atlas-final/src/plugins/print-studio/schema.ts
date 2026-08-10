@@ -20,6 +20,14 @@ export interface CardPlacement {
   widthIn: number;
   heightIn: number;
   rotationDeg: number;
+  /**
+   * Which page of the asset's rendered card to show, for asset types that
+   * support renderCardToCanvases (multi-card content, e.g. a creature
+   * whose stat block spans several cards). 0 for the first/only card.
+   * Undefined is equivalent to 0 and covers asset types that only
+   * implement the single-canvas renderCardToCanvas.
+   */
+  cardPageIndex?: number;
 }
 
 export interface PrintPage {
