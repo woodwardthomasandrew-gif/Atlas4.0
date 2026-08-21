@@ -4,6 +4,9 @@ import {
   formatAbilityEntry,
   formatAbilityLine,
   formatCrLine,
+  formatEquipmentEntry,
+  formatLootTableEntry,
+  formatSpellcastingBody,
   formatSensesLine,
   formatSpeedLine,
   sizeLabel
@@ -164,6 +167,98 @@ function traitBlock(measureCtx: CanvasRenderingContext2D, trait: CreatureAbility
       return next + 4;
     }
   };
+}
+
+function textBlock(measureCtx: CanvasRenderingContext2D, text: string, font = "13px sans-serif"): Block {
+  const lines = wrapLines(measureCtx, text, {
+    font,
+    color: TEXT_PRIMARY,
+    maxWidth: CONTENT_WIDTH,
+    lineHeight: LINE_HEIGHT
+  });
+  return {
+    height: lines.length * LINE_HEIGHT + 4,
+    draw: (ctx, cy) => {
+      const next = drawWrapped(ctx, text, MARGIN, cy, {
+        font,
+        color: TEXT_PRIMARY,
+        maxWidth: CONTENT_WIDTH,
+        lineHeight: LINE_HEIGHT
+      });
+      return next + 4;
+    }
+  };
+}
+
+function textSectionBlocks(
+  measureCtx: CanvasRenderingContext2D,
+  title: string,
+  lines: string[],
+  options: { prefix?: string; font?: string } = {}
+): Block[] {
+  if (lines.length === 0) return [];
+  const prefix = options.prefix ?? "";
+  const font = options.font ?? "13px sans-serif";
+  const blocks: Block[] = [];
+  const [first, ...rest] = lines;
+
+  blocks.push({
+    height: sectionTitleHeight() + textBlock(measureCtx, `${prefix}${first}`, font).height,
+    draw: (ctx, cy) => {
+      cy = drawSectionTitle(ctx, title, cy);
+      return textBlock(measureCtx, `${prefix}${first}`, font).draw(ctx, cy);
+    }
+  });
+
+  for (const line of rest) {
+    blocks.push(textBlock(measureCtx, `${prefix}${line}`, font));
+  }
+
+  return blocks;
+}
+
+/** Equipment section header glued to its first line, so it never gets orphaned on a page break. */
+function equipmentSectionBlocks(measureCtx: CanvasRenderingContext2D, data: CreatureData): Block[] {
+  if (data.equipment.length === 0) return [];
+  return textSectionBlocks(
+    measureCtx,
+    "Equipment",
+    data.equipment.map(formatEquipmentEntry)
+  );
+}
+
+function spellcastingSectionBlocks(
+  measureCtx: CanvasRenderingContext2D,
+  title: string,
+  block: CreatureData["spellcasting"]
+): Block[] {
+  const lines = formatSpellcastingBody(block);
+  return textSectionBlocks(measureCtx, title, lines);
+}
+
+function listSectionBlocks(measureCtx: CanvasRenderingContext2D, title: string, values: string[]): Block[] {
+  return textSectionBlocks(measureCtx, title, values.map((value) => `- ${value}`));
+}
+
+function lootTableSectionBlocks(measureCtx: CanvasRenderingContext2D, data: CreatureData): Block[] {
+  return textSectionBlocks(
+    measureCtx,
+    "Loot Table",
+    data.lootTable.map(formatLootTableEntry)
+  );
+}
+
+function notesSectionBlocks(measureCtx: CanvasRenderingContext2D, notes: string): Block[] {
+  const trimmed = notes.trim();
+  if (!trimmed) return [];
+  return textSectionBlocks(measureCtx, "Notes", trimmed.split("\n").map((line) => line.trim()).filter(Boolean), {
+    font: "13px sans-serif"
+  });
+}
+
+function tagsSectionBlocks(measureCtx: CanvasRenderingContext2D, tags: string[]): Block[] {
+  if (tags.length === 0) return [];
+  return textSectionBlocks(measureCtx, "Tags", [tags.join(", ")]);
 }
 
 function sectionTitleHeight(): number {
@@ -512,6 +607,20 @@ function buildContentBlocks(measureCtx: CanvasRenderingContext2D, data: Creature
     blocks.push(sectionOpenBlock(measureCtx, title, entries[0]));
     for (const entry of entries.slice(1)) blocks.push(entryBlock(measureCtx, entry));
   }
+
+  blocks.push(...spellcastingSectionBlocks(measureCtx, "Spellcasting", data.spellcasting));
+
+  blocks.push(...spellcastingSectionBlocks(measureCtx, "Innate Spellcasting", data.innateSpellcasting));
+
+  blocks.push(...listSectionBlocks(measureCtx, "Regional Effects", data.regionalEffects));
+
+  blocks.push(...equipmentSectionBlocks(measureCtx, data));
+
+  blocks.push(...lootTableSectionBlocks(measureCtx, data));
+
+  blocks.push(...notesSectionBlocks(measureCtx, data.notes));
+
+  blocks.push(...tagsSectionBlocks(measureCtx, data.tags));
 
   return blocks;
 }

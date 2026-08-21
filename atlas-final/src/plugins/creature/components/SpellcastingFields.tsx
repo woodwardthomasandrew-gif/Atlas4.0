@@ -5,6 +5,15 @@ import "./SpellcastingFields.css";
 
 const SPELL_ASSET_TYPE = "spell";
 
+/** Reads the stored spell level off a picked asset's raw data (0 for cantrips, falls back to 0 if absent). */
+function extractSpellLevel(data: unknown): number {
+  if (data && typeof data === "object" && "level" in data) {
+    const level = (data as { level?: unknown }).level;
+    if (typeof level === "number") return level;
+  }
+  return 0;
+}
+
 const ABILITY_OPTIONS: AbilityKey[] = ["int", "wis", "cha"];
 
 export interface SpellcastingFieldsProps {
@@ -83,7 +92,8 @@ export function SpellcastingFields({ value, onChange }: SpellcastingFieldsProps)
             assetType={SPELL_ASSET_TYPE}
             onPick={(ref) => {
               if (value.spellRefs.some((r) => r.assetId === ref.assetId)) return;
-              onChange({ ...value, spellRefs: [...value.spellRefs, ref] });
+              const level = extractSpellLevel(ref.data);
+              onChange({ ...value, spellRefs: [...value.spellRefs, { assetId: ref.assetId, name: ref.name, level }] });
             }}
           />
 

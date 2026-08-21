@@ -8,9 +8,11 @@ export interface SenseRowProps {
   onChange: (value: SenseValue) => void;
   /** Shown next to the label when auto is on and a calculated value is available (passive perception only). */
   calculatedValue?: number;
+  /** Increment step for the numeric input, e.g. 5 for distance-based senses like darkvision. */
+  step?: number;
 }
 
-export function SenseRow({ label, value, onChange, calculatedValue }: SenseRowProps): JSX.Element {
+export function SenseRow({ label, value, onChange, calculatedValue, step }: SenseRowProps): JSX.Element {
   return (
     <div className="sense-row">
       <span className="sense-row__label">{label}</span>
@@ -26,8 +28,14 @@ export function SenseRow({ label, value, onChange, calculatedValue }: SenseRowPr
         <Input
           type="number"
           className="sense-row__value"
+          step={step}
+          min={step ? 0 : undefined}
           value={value.value}
-          onChange={(e) => onChange({ ...value, value: Number(e.target.value) })}
+          onChange={(e) => {
+            const raw = Number(e.target.value);
+            const snapped = step ? Math.max(0, Math.round(raw / step) * step) : raw;
+            onChange({ ...value, value: snapped });
+          }}
         />
       )}
       {value.auto && calculatedValue !== undefined && (

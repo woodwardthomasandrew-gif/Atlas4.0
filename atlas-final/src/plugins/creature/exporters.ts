@@ -6,6 +6,9 @@ import {
   formatCrLine,
   formatSensesLine,
   formatSpeedLine,
+  formatEquipmentEntry,
+  formatLootTableEntry,
+  formatSpellcastingBody,
   sizeLabel
 } from "./cardText";
 import { renderCreatureCardToPng } from "./cardRenderer";
@@ -83,14 +86,42 @@ const markdownExporter: AssetExporter<CreatureData> = {
       }
     }
 
+    const spellcastingSections: Array<[string, string[]]> = [
+      ["Spellcasting", formatSpellcastingBody(data.spellcasting)],
+      ["Innate Spellcasting", formatSpellcastingBody(data.innateSpellcasting)]
+    ];
+
+    for (const [title, body] of spellcastingSections) {
+      if (body.length === 0) continue;
+      lines.push(`## ${title}`, "");
+      for (const line of body) lines.push(line);
+      lines.push("");
+    }
+
     if (data.regionalEffects.length > 0) {
       lines.push("## Regional Effects", "");
       for (const effect of data.regionalEffects) lines.push(`- ${effect}`);
       lines.push("");
     }
 
+    if (data.equipment.length > 0) {
+      lines.push("## Equipment", "");
+      for (const entry of data.equipment) lines.push(`- ${formatEquipmentEntry(entry)}`);
+      lines.push("");
+    }
+
+    if (data.lootTable.length > 0) {
+      lines.push("## Loot Table", "");
+      for (const entry of data.lootTable) lines.push(`- ${formatLootTableEntry(entry)}`);
+      lines.push("");
+    }
+
     if (data.notes.trim().length > 0) {
       lines.push("## Notes", "", data.notes, "");
+    }
+
+    if (data.tags.length > 0) {
+      lines.push("## Tags", "", data.tags.join(", "), "");
     }
 
     return lines.join("\n");

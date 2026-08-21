@@ -169,6 +169,8 @@ export function createAbilityEntry(): CreatureAbilityEntry {
 export interface SpellReference {
   assetId: string;
   name: string;
+  /** Spell level captured at pick-time (0 = cantrip) so the card can group without re-fetching the spell asset. */
+  level: number;
 }
 
 export interface SpellcastingBlock {
@@ -388,7 +390,11 @@ export function normalizeCreatureData(raw: unknown): CreatureData {
   const normalizeSpellcasting = (value: Partial<SpellcastingBlock> | undefined): SpellcastingBlock => ({
     ...createDefaultSpellcasting(),
     ...value,
-    spellRefs: value?.spellRefs ?? []
+    spellRefs: (value?.spellRefs ?? []).map((ref) => ({
+      assetId: ref.assetId,
+      name: ref.name,
+      level: typeof ref.level === "number" ? ref.level : 0
+    }))
   });
 
   return {

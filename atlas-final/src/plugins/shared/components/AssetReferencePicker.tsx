@@ -6,6 +6,8 @@ import "./AssetReferencePicker.css";
 export interface AssetReference {
   assetId: string;
   name: string;
+  /** The referenced asset's full stored data, e.g. so callers can read a spell's level without a second lookup. */
+  data?: unknown;
 }
 
 export interface AssetReferencePickerProps {
@@ -60,7 +62,7 @@ export function AssetReferencePicker({ assetType, onPick }: AssetReferencePicker
       onChange={(e) => {
         const record = records.find((r) => r.id === e.target.value);
         if (record) {
-          onPick({ assetId: record.id, name: record.name });
+          onPick({ assetId: record.id, name: record.name, data: record.data });
         }
         e.target.value = "";
       }}

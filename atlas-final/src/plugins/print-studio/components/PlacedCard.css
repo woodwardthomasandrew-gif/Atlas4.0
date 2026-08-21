@@ -23,3 +23,38 @@
      to 100%/100%, which would distort tall content. */
   display: block;
 }
+
+.placed-card__handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 2px solid var(--atlas-accent);
+  border-radius: 2px;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.placed-card__handle--nw {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.placed-card__handle--ne {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.placed-card__handle--sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.placed-card__handle--se {
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}

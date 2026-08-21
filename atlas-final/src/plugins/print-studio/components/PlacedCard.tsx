@@ -12,14 +12,31 @@ export interface MoveDragPayload {
   grabOffsetYIn: number;
 }
 
+export type ResizeCorner = "nw" | "ne" | "sw" | "se";
+
+export interface ResizeState {
+  placementId: string;
+  corner: ResizeCorner;
+  startXIn: number;
+  startYIn: number;
+  startWidthIn: number;
+  startHeightIn: number;
+  aspectRatio: number;
+  pointerStartXPx: number;
+  pointerStartYPx: number;
+}
+
 export interface PlacedCardProps {
   placement: CardPlacement;
   pxPerIn: number;
   selected: boolean;
   onSelect: () => void;
+  onResizeStart?: (state: ResizeState) => void;
 }
 
-export function PlacedCard({ placement, pxPerIn, selected, onSelect }: PlacedCardProps): JSX.Element {
+const MIN_SIZE_IN = 0.25;
+
+export function PlacedCard({ placement, pxPerIn, selected, onSelect, onResizeStart }: PlacedCardProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [record, setRecord] = useState<{ name: string; data: unknown } | null>(null);
   const [renderSize, setRenderSize] = useState<{ width: number; height: number } | null>(null);
@@ -84,6 +101,24 @@ export function PlacedCard({ placement, pxPerIn, selected, onSelect }: PlacedCar
     e.dataTransfer.effectAllowed = "move";
   };
 
+  const startResize = (corner: ResizeCorner) => (e: React.MouseEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    onSelect();
+    if (!onResizeStart) return;
+    onResizeStart({
+      placementId: placement.id,
+      corner,
+      startXIn: placement.xIn,
+      startYIn: placement.yIn,
+      startWidthIn: placement.widthIn,
+      startHeightIn: placement.heightIn,
+      aspectRatio: placement.widthIn / placement.heightIn,
+      pointerStartXPx: e.clientX,
+      pointerStartYPx: e.clientY
+    });
+  };
+
   return (
     <div
       className={`placed-card ${selected ? "placed-card--selected" : ""}`}
@@ -106,6 +141,16 @@ export function PlacedCard({ placement, pxPerIn, selected, onSelect }: PlacedCar
         className="placed-card__canvas"
         style={{ width: `${fitWidthPx}px`, height: `${fitHeightPx}px` }}
       />
+      {selected && onResizeStart && (
+        <>
+          <div className="placed-card__handle placed-card__handle--nw" onMouseDown={startResize("nw")} />
+          <div className="placed-card__handle placed-card__handle--ne" onMouseDown={startResize("ne")} />
+          <div className="placed-card__handle placed-card__handle--sw" onMouseDown={startResize("sw")} />
+          <div className="placed-card__handle placed-card__handle--se" onMouseDown={startResize("se")} />
+        </>
+      )}
     </div>
   );
 }
+
+export { MIN_SIZE_IN };

@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PAGE_DIMENSIONS_IN, type CardPlacement, type PageSize, type PrintPage } from "../schema";
 import { DRAG_MIME_TYPE, type DraggedCardPayload } from "./CardLibrary";
-import { PlacedCard, type MoveDragPayload } from "./PlacedCard";
+import { PlacedCard, MIN_SIZE_IN, type MoveDragPayload, type ResizeState } from "./PlacedCard";
 import "./PageSurface.css";
 
 /** Screen pixels per inch while editing. Export uses its own, higher-resolution DPI. */
@@ -24,6 +24,80 @@ export function PageSurface({
 }: PageSurfaceProps): JSX.Element {
   const surfaceRef = useRef<HTMLDivElement>(null);
   const dims = PAGE_DIMENSIONS_IN[pageSize];
+  const [resizeState, setResizeState] = useState<ResizeState | null>(null);
+  const placementsRef = useRef(page.placements);
+  placementsRef.current = page.placements;
+
+  useEffect(() => {
+    if (!resizeState) return;
+
+    const handleMouseMove = (e: MouseEvent): void => {
+      const dxIn = (e.clientX - resizeState.pointerStartXPx) / EDIT_PX_PER_IN;
+      const dyIn = (e.clientY - resizeState.pointerStartYPx) / EDIT_PX_PER_IN;
+      const unconstrained = e.shiftKey;
+
+      let { startXIn, startYIn, startWidthIn, startHeightIn, aspectRatio, corner } = resizeState;
+
+      // Determine raw new width/height from pointer movement, depending on
+      // which corner is being dragged; the opposite edge stays anchored.
+      let newWidthIn = startWidthIn;
+      let newHeightIn = startHeightIn;
+
+      const east = corner === "ne" || corner === "se";
+      const south = corner === "sw" || corner === "se";
+
+      if (east) {
+        newWidthIn = startWidthIn + dxIn;
+      } else {
+        newWidthIn = startWidthIn - dxIn;
+      }
+
+      if (south) {
+        newHeightIn = startHeightIn + dyIn;
+      } else {
+        newHeightIn = startHeightIn - dyIn;
+      }
+
+      newWidthIn = Math.max(MIN_SIZE_IN, newWidthIn);
+      newHeightIn = Math.max(MIN_SIZE_IN, newHeightIn);
+
+      if (!unconstrained) {
+        // Preserve aspect ratio: pick the dominant axis of movement to drive sizing.
+        if (Math.abs(dxIn) >= Math.abs(dyIn)) {
+          newHeightIn = newWidthIn / aspectRatio;
+        } else {
+          newWidthIn = newHeightIn * aspectRatio;
+        }
+        newWidthIn = Math.max(MIN_SIZE_IN, newWidthIn);
+        newHeightIn = Math.max(MIN_SIZE_IN, newHeightIn);
+      }
+
+      const xIn = east ? startXIn : startXIn + startWidthIn - newWidthIn;
+      const yIn = south ? startYIn : startYIn + startHeightIn - newHeightIn;
+
+      const clampedXIn = clamp(xIn, 0, Math.max(0, dims.widthIn - newWidthIn));
+      const clampedYIn = clamp(yIn, 0, Math.max(0, dims.heightIn - newHeightIn));
+
+      const next = placementsRef.current.map((p) =>
+        p.id === resizeState.placementId
+          ? { ...p, xIn: clampedXIn, yIn: clampedYIn, widthIn: newWidthIn, heightIn: newHeightIn }
+          : p
+      );
+      onChangePlacements(next);
+    };
+
+    const handleMouseUp = (): void => {
+      setResizeState(null);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resizeState, dims.widthIn, dims.heightIn]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
@@ -100,6 +174,7 @@ export function PageSurface({
           pxPerIn={EDIT_PX_PER_IN}
           selected={placement.id === selectedId}
           onSelect={() => onSelect(placement.id)}
+          onResizeStart={setResizeState}
         />
       ))}
     </div>

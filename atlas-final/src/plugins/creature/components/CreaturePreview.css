@@ -62,3 +62,9 @@
 .creature-card__entry {
   line-height: 1.4;
 }
+
+.creature-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

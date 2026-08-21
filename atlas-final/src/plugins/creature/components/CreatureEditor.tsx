@@ -256,21 +256,25 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
             label="Darkvision"
             value={data.senses.darkvision}
             onChange={(v) => updateSense("darkvision", v)}
+            step={5}
           />
           <SenseRow
             label="Blindsight"
             value={data.senses.blindsight}
             onChange={(v) => updateSense("blindsight", v)}
+            step={5}
           />
           <SenseRow
             label="Tremorsense"
             value={data.senses.tremorsense}
             onChange={(v) => updateSense("tremorsense", v)}
+            step={5}
           />
           <SenseRow
             label="Truesight"
             value={data.senses.truesight}
             onChange={(v) => updateSense("truesight", v)}
+            step={5}
           />
         </div>
       </section>
