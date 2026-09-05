@@ -1,6 +1,7 @@
 import type { RouteObject } from "react-router-dom";
 import { DashboardPage } from "@pages/dashboard/DashboardPage";
 import { getPluginRoutes } from "./routeRegistry";
+import { SettingsPage } from "@pages/settings/SettingsPage";
 
 /**
  * Core route table. Only the dashboard is defined here — everything
@@ -12,7 +13,8 @@ function coreRoutes(): RouteObject[] {
     {
       path: "/",
       element: <DashboardPage />
-    }
+    },
+    { path: "/settings", element: <SettingsPage /> }
   ];
 }
 

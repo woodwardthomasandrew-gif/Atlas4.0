@@ -366,7 +366,9 @@ function frontMatterBlock(measureCtx: CanvasRenderingContext2D, name: string, da
     LINE_HEIGHT
   );
   height += measureLabeledLineHeight(measureCtx, "Speed", formatSpeedLine(data), CONTENT_WIDTH, LINE_HEIGHT);
-  height += 16;
+  // Matches the 16px spacing before and after the divider drawn below the
+  // basic combat lines.
+  height += 32;
   height +=
     wrapLines(measureCtx, formatAbilityLine(data), {
       font: "12px monospace",
@@ -374,7 +376,8 @@ function frontMatterBlock(measureCtx: CanvasRenderingContext2D, name: string, da
       maxWidth: CONTENT_WIDTH,
       lineHeight: LINE_HEIGHT
     }).length * LINE_HEIGHT;
-  height += 16;
+  // Matches the 16px spacing before and after the ability-score divider.
+  height += 32;
 
   if (data.savingThrows.length > 0) {
     height += measureLabeledLineHeight(
@@ -435,7 +438,8 @@ function frontMatterBlock(measureCtx: CanvasRenderingContext2D, name: string, da
     height += measureLabeledLineHeight(measureCtx, "Languages", data.languages, CONTENT_WIDTH, LINE_HEIGHT);
   }
   height += measureLabeledLineHeight(measureCtx, "Challenge", formatCrLine(data), CONTENT_WIDTH, LINE_HEIGHT);
-  height += 16;
+  // Matches the 16px spacing before and after the final divider.
+  height += 32;
 
   return {
     height,
@@ -643,7 +647,11 @@ function planCards(measureCtx: CanvasRenderingContext2D, name: string, data: Cre
   const budget = MAX_CARD_HEIGHT_PX - MARGIN; // bottom margin reserved
 
   for (const block of contentBlocks) {
-    if (currentHeight + block.height > budget && currentBlocks.length > 1) {
+    // Keep every content block inside the card budget. The old guard skipped
+    // the break when the front matter was the only block on the first card,
+    // allowing the first long trait/action to overflow and appear cut short
+    // in Print Studio.
+    if (currentHeight + block.height > budget) {
       // Close out the current card and start a new continuation card.
       plans.push({ blocks: currentBlocks, height: Math.max(currentHeight + MARGIN, 400) });
       currentBlocks = [continuationHeaderBlock(name)];

@@ -1,5 +1,5 @@
 import type { AssetEditorProps } from "@app/plugin-api/types";
-import { Input } from "@ui/components";
+import { Button, Input } from "@ui/components";
 import { CollapsibleSection } from "@plugins/shared/components/CollapsibleSection";
 import { TagSelect } from "@plugins/shared/components/TagSelect";
 import { ChipInput } from "@plugins/shared/components/ChipInput";
@@ -10,6 +10,7 @@ import {
   COMMON_ALIGNMENTS,
   COMMON_CREATURE_TYPE_TAGS,
   CREATURE_SIZES,
+  proficiencyBonusForChallengeRating,
   resolveExperience,
   resolvePassivePerception,
   type CreatureData,
@@ -32,6 +33,24 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
 
   const updateSense = (key: keyof CreatureData["senses"], value: SenseValue): void => {
     onChange({ ...data, senses: { ...data.senses, [key]: value } });
+  };
+
+  const updateChallengeRating = (challengeRating: string): void => {
+    onChange({
+      ...data,
+      challengeRating,
+      ...(data.proficiencyBonusMode === "auto"
+        ? { proficiencyBonus: proficiencyBonusForChallengeRating(challengeRating) }
+        : {})
+    });
+  };
+
+  const resetProficiencyBonus = (): void => {
+    onChange({
+      ...data,
+      proficiencyBonus: proficiencyBonusForChallengeRating(data.challengeRating),
+      proficiencyBonusMode: "auto"
+    });
   };
 
   return (
@@ -89,7 +108,7 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
             <span>Challenge Rating</span>
             <select
               value={data.challengeRating}
-              onChange={(e) => update("challengeRating", e.target.value)}
+              onChange={(e) => updateChallengeRating(e.target.value)}
             >
               {CHALLENGE_RATINGS.map((cr) => (
                 <option key={cr} value={cr}>
@@ -97,6 +116,32 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="creature-editor__field">
+            <span>Proficiency Bonus</span>
+            <div className="creature-editor__derived-row">
+              <Input
+                type="number"
+                value={data.proficiencyBonus}
+                onChange={(e) =>
+                  onChange({
+                    ...data,
+                    proficiencyBonus: Number(e.target.value),
+                    proficiencyBonusMode: "manual"
+                  })
+                }
+              />
+              {data.proficiencyBonusMode === "auto" ? (
+                <span className="creature-editor__calculated" title="Follows Challenge Rating">
+                  🔗
+                </span>
+              ) : (
+                <Button type="button" variant="ghost" onClick={resetProficiencyBonus}>
+                  Reset to CR-derived value
+                </Button>
+              )}
+            </div>
           </label>
 
           <label className="creature-editor__field">

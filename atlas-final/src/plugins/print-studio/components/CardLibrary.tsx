@@ -1,9 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { listAssets, type AssetRecord } from "@app/db/assetStore";
+import { filterAssetsByName } from "@app/search/assetSearch";
 import { getAllAssetTypes } from "@app/registry/assetRegistry";
+import { AssetSearchField } from "@plugins/shared/components/AssetSearchField";
 import "./CardLibrary.css";
 
 export const DRAG_MIME_TYPE = "application/x-atlas-card";
+const CATEGORY_STATE_KEY = "atlas.print-shop.category-expansion";
+
+type CategoryExpansionState = Record<string, boolean>;
+
+function readCategoryExpansionState(): CategoryExpansionState {
+  try {
+    const stored = sessionStorage.getItem(CATEGORY_STATE_KEY);
+    if (!stored) return {};
+    const parsed: unknown = JSON.parse(stored);
+    if (!parsed || typeof parsed !== "object") return {};
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, boolean] => typeof entry[1] === "boolean")
+    );
+  } catch {
+    return {};
+  }
+}
 
 /** One physical card's real size, derived from its actual rendered content rather than a guessed default. */
 export interface DraggedCardPage {
@@ -70,6 +89,10 @@ function Thumbnail({ assetType, record }: { assetType: string; record: AssetReco
 
 export function CardLibrary(): JSX.Element {
   const [recordsByType, setRecordsByType] = useState<Record<string, AssetRecord[]>>({});
+  const [query, setQuery] = useState("");
+  const [expandedByType, setExpandedByType] = useState<CategoryExpansionState>(
+    readCategoryExpansionState
+  );
 
   const placeableTypes = getAllAssetTypes().filter((d) => d.renderCardToCanvas && d.cardSize);
 
@@ -86,6 +109,26 @@ export function CardLibrary(): JSX.Element {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(CATEGORY_STATE_KEY, JSON.stringify(expandedByType));
+    } catch {
+      // Category expansion is only a convenience; storage may be unavailable.
+    }
+  }, [expandedByType]);
+
+  const filteredRecordsByType = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(recordsByType).map(([type, records]) => [type, filterAssetsByName(records, query)])
+      ),
+    [recordsByType, query]
+  );
+  const totalFilteredRecords = Object.values(filteredRecordsByType).reduce(
+    (count, records) => count + records.length,
+    0
+  );
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -112,28 +155,53 @@ export function CardLibrary(): JSX.Element {
 
   return (
     <div className="card-library">
+      <AssetSearchField value={query} onChange={setQuery} />
+      {query.trim().length > 0 && totalFilteredRecords === 0 && (
+        <p className="card-library__note">No saved assets found. Try a different name or clear the search.</p>
+      )}
       {placeableTypes.map((definition) => {
-        const records = recordsByType[definition.type] ?? [];
+        const allRecords = recordsByType[definition.type] ?? [];
+        const records = filteredRecordsByType[definition.type] ?? [];
+        if (query.trim().length > 0 && records.length === 0) return null;
+        const searchActive = query.trim().length > 0;
+        const expanded = searchActive || expandedByType[definition.type] !== false;
         return (
           <div key={definition.type} className="card-library__group">
-            <h3>{definition.pluralLabel}</h3>
-            {records.length === 0 && (
-              <p className="card-library__note">No saved {definition.pluralLabel.toLowerCase()}.</p>
-            )}
-            <div className="card-library__grid">
-              {records.map((record) => (
-                <div
-                  key={record.id}
-                  className="card-library__item"
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, definition.type, record)}
-                  title={record.name}
-                >
-                  <Thumbnail assetType={definition.type} record={record} />
-                  <span className="card-library__item-name">{record.name}</span>
+            <button
+              type="button"
+              className="card-library__category-toggle"
+              aria-expanded={expanded}
+              onClick={() =>
+                setExpandedByType((current) => ({ ...current, [definition.type]: !expanded }))
+              }
+            >
+              <span className="card-library__category-chevron" aria-hidden="true">
+                {expanded ? "▼" : "▶"}
+              </span>
+              <span>{definition.pluralLabel}</span>
+              <span className="card-library__category-count">({allRecords.length})</span>
+            </button>
+            {expanded && (
+              <>
+                {allRecords.length === 0 && (
+                  <p className="card-library__note">No saved {definition.pluralLabel.toLowerCase()}.</p>
+                )}
+                <div className="card-library__grid">
+                  {records.map((record) => (
+                    <div
+                      key={record.id}
+                      className="card-library__item"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, definition.type, record)}
+                      title={record.name}
+                    >
+                      <Thumbnail assetType={definition.type} record={record} />
+                      <span className="card-library__item-name">{record.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
         );
       })}

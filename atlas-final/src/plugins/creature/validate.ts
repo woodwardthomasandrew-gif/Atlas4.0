@@ -20,6 +20,10 @@ export function validateCreature(data: CreatureData): ValidationResult {
     errors.push({ field: "hitPoints", message: "Hit points must be greater than 0." });
   }
 
+  if (!Number.isFinite(data.proficiencyBonus)) {
+    errors.push({ field: "proficiencyBonus", message: "Proficiency bonus must be a number." });
+  }
+
   if (data.experienceMode === "manual" && data.experienceManualValue < 0) {
     errors.push({ field: "experienceManualValue", message: "Manual experience cannot be negative." });
   }

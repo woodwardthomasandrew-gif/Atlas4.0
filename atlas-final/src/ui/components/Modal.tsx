@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
 import "./Modal.css";
 
 export interface ModalProps {
@@ -11,13 +12,7 @@ export interface ModalProps {
 
 /** Minimal generic overlay dialog. Closes on backdrop click or Escape. */
 export function Modal({ title, onClose, children, wide }: ModalProps): JSX.Element {
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
+  useShortcutAction("close-overlay", onClose);
 
   return (
     <div className="atlas-modal__backdrop" onClick={onClose}>

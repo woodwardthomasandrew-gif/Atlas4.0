@@ -5,6 +5,10 @@ import { getAssetType } from "@app/registry/assetRegistry";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { CREATURE_TYPE, normalizeCreatureData, type CreatureData } from "../schema";
+import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
+import { useHistoryState } from "@app/shortcuts/useHistoryState";
+import { duplicateAsset } from "@app/db/assetStore";
+import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
 import "./CreatureEditPage.css";
 
 function generateId(): string {
@@ -23,9 +27,10 @@ export function CreatureEditPage(): JSX.Element {
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
   const [name, setName] = useState("");
-  const [data, setData] = useState<CreatureData>(() => definition.createDefaultData() as CreatureData);
+  const [data, setData, undo, redo] = useHistoryState<CreatureData>(definition.createDefaultData() as CreatureData);
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
+  const { notifySaved } = useSaveContext();
 
   useEffect(() => {
     if (isNew) return;
@@ -41,26 +46,35 @@ export function CreatureEditPage(): JSX.Element {
       });
   }, [assetId, isNew]);
 
-  const handleSave = async (): Promise<void> => {
+  const saveCurrent = async (reason: SaveReason): Promise<boolean> => {
     const result = definition.validate(data);
-    if (!result.valid) {
+    if (reason === "manual" && !result.valid) {
       setErrors(result.errors.map((e) => e.message));
-      return;
+      return false;
     }
-    if (!name.trim()) {
+    if (reason === "manual" && !name.trim()) {
       setErrors(["Name is required."]);
-      return;
+      return false;
     }
 
     setErrors([]);
     await saveAsset({ id: assetId, type: CREATURE_TYPE, name, data });
-    navigate("/creatures");
+    return true;
+  };
+  const handleSave = async (): Promise<void> => {
+    if (await saveCurrent("manual")) { notifySaved("manual"); navigate("/creatures"); }
   };
 
   const handleDelete = async (): Promise<void> => {
     await deleteAsset(assetId);
     navigate("/creatures");
   };
+  const handleDuplicate = async (): Promise<void> => { if (isNew) return; const duplicate = await duplicateAsset(assetId); navigate(`/creatures/${duplicate.id}`); };
+  useShortcutAction("save", handleSave, loaded);
+  useAutosave(saveCurrent, loaded);
+  useShortcutAction("duplicate", handleDuplicate, loaded && !isNew);
+  useShortcutAction("undo", undo, loaded);
+  useShortcutAction("redo", redo, loaded);
 
   const handleExport = async (exporterId: string): Promise<void> => {
     const exporter = definition.exporters.find((e) => e.id === exporterId);

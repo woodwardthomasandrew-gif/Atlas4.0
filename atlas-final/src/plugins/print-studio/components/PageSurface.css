@@ -1,6 +1,23 @@
+.page-surface-viewport {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .page-surface {
   position: relative;
   background: #ffffff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   flex-shrink: 0;
+  transform-origin: top left;
+}
+
+/* Workspace-only guide: this DOM layer is never part of PrintLayoutData or PDF export. */
+.page-surface__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(40, 45, 55, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(40, 45, 55, 0.12) 1px, transparent 1px);
+  background-size: 36px 36px;
 }

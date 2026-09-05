@@ -97,6 +97,14 @@ export const CR_TO_XP: Record<string, number> = {
   "30": 155000
 };
 
+/** Standard 5e creature proficiency bonus for a challenge rating. */
+export function proficiencyBonusForChallengeRating(challengeRating: string): number {
+  const [numerator, denominator] = challengeRating.split("/").map(Number);
+  const numericCr = denominator ? numerator / denominator : Number(challengeRating);
+  if (!Number.isFinite(numericCr)) return 2;
+  return Math.min(9, Math.max(2, Math.floor((numericCr - 1) / 4) + 2));
+}
+
 export interface CreatureSpeed {
   walk: number;
   climb: number;
@@ -236,6 +244,8 @@ export interface CreatureData {
   creatureType: string;
   alignment: string;
   challengeRating: string;
+  proficiencyBonus: number;
+  proficiencyBonusMode: "auto" | "manual";
   experienceMode: "auto" | "manual";
   experienceManualValue: number;
 
@@ -289,6 +299,7 @@ export const creatureSchema: AssetSchema = {
       required: true,
       options: CHALLENGE_RATINGS
     },
+    { key: "proficiencyBonus", label: "Proficiency Bonus", type: "number", required: true },
     { key: "armorClass", label: "Armor Class", type: "number", required: true },
     { key: "hitPoints", label: "Hit Points", type: "number", required: true },
     { key: "hitDice", label: "Hit Dice", type: "string" }
@@ -319,6 +330,8 @@ export function createDefaultCreatureData(): CreatureData {
     creatureType: "",
     alignment: "unaligned",
     challengeRating: "0",
+    proficiencyBonus: 2,
+    proficiencyBonusMode: "auto",
     experienceMode: "auto",
     experienceManualValue: 0,
 
@@ -402,6 +415,13 @@ export function normalizeCreatureData(raw: unknown): CreatureData {
     creatureType: data.creatureType ?? defaults.creatureType,
     alignment: data.alignment ?? defaults.alignment,
     challengeRating: data.challengeRating ?? defaults.challengeRating,
+    proficiencyBonus:
+      typeof data.proficiencyBonus === "number"
+        ? data.proficiencyBonus
+        : proficiencyBonusForChallengeRating(data.challengeRating ?? defaults.challengeRating),
+    proficiencyBonusMode:
+      data.proficiencyBonusMode ??
+      (typeof data.proficiencyBonus === "number" ? "manual" : defaults.proficiencyBonusMode),
     experienceMode: data.experienceMode ?? defaults.experienceMode,
     experienceManualValue: data.experienceManualValue ?? defaults.experienceManualValue,
 

@@ -10,12 +10,29 @@ import { registerMagicItemPlugin } from "@plugins/magic-item";
 import { registerCreaturePlugin } from "@plugins/creature";
 import { registerSpellPlugin } from "@plugins/spell";
 import { registerPrintStudioPlugin } from "@plugins/print-studio";
+import { registerSearchProvider } from "@app/search/searchRegistry";
+import { listAssets } from "@app/db/assetStore";
+import { getNavItems } from "@app/navigation/navRegistry";
 
 export function loadPlugins(): void {
   registerMagicItemPlugin();
   registerCreaturePlugin();
   registerSpellPlugin();
   registerPrintStudioPlugin();
+  registerSearchProvider("assets", async (query) => {
+    const term = query.trim().toLowerCase();
+    if (!term) return [];
+    return (await listAssets()).filter((asset) => asset.name.toLowerCase().includes(term)).map((asset) => ({
+      id: asset.id,
+      title: asset.name || "Untitled asset",
+      subtitle: asset.type,
+      assetType: asset.type,
+      onSelect: () => {
+        const path = getNavItems().find((item) => item.path.includes(asset.type))?.path;
+        if (path) window.location.hash = `#${path}/${asset.id}`;
+      }
+    }));
+  });
 }
 
 loadPlugins();

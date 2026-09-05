@@ -5,6 +5,10 @@ import { getAssetType } from "@app/registry/assetRegistry";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { MAGIC_ITEM_TYPE, normalizeMagicItemData, type MagicItemData } from "../schema";
+import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
+import { useHistoryState } from "@app/shortcuts/useHistoryState";
+import { duplicateAsset } from "@app/db/assetStore";
+import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
 import "./MagicItemEditPage.css";
 
 function generateId(): string {
@@ -23,11 +27,10 @@ export function MagicItemEditPage(): JSX.Element {
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
   const [name, setName] = useState("");
-  const [data, setData] = useState<MagicItemData>(
-    () => definition.createDefaultData() as MagicItemData
-  );
+  const [data, setData, undo, redo] = useHistoryState<MagicItemData>(definition.createDefaultData() as MagicItemData);
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
+  const { notifySaved } = useSaveContext();
 
   useEffect(() => {
     if (isNew) return;
@@ -43,26 +46,35 @@ export function MagicItemEditPage(): JSX.Element {
       });
   }, [assetId, isNew]);
 
-  const handleSave = async (): Promise<void> => {
+  const saveCurrent = async (reason: SaveReason): Promise<boolean> => {
     const result = definition.validate(data);
-    if (!result.valid) {
+    if (reason === "manual" && !result.valid) {
       setErrors(result.errors.map((e) => e.message));
-      return;
+      return false;
     }
-    if (!name.trim()) {
+    if (reason === "manual" && !name.trim()) {
       setErrors(["Name is required."]);
-      return;
+      return false;
     }
 
     setErrors([]);
     await saveAsset({ id: assetId, type: MAGIC_ITEM_TYPE, name, data });
-    navigate("/magic-items");
+    return true;
+  };
+  const handleSave = async (): Promise<void> => {
+    if (await saveCurrent("manual")) { notifySaved("manual"); navigate("/magic-items"); }
   };
 
   const handleDelete = async (): Promise<void> => {
     await deleteAsset(assetId);
     navigate("/magic-items");
   };
+  const handleDuplicate = async (): Promise<void> => { if (isNew) return; const duplicate = await duplicateAsset(assetId); navigate(`/magic-items/${duplicate.id}`); };
+  useShortcutAction("save", handleSave, loaded);
+  useAutosave(saveCurrent, loaded);
+  useShortcutAction("duplicate", handleDuplicate, loaded && !isNew);
+  useShortcutAction("undo", undo, loaded);
+  useShortcutAction("redo", redo, loaded);
 
   const handleExport = async (exporterId: string): Promise<void> => {
     const exporter = definition.exporters.find((e) => e.id === exporterId);

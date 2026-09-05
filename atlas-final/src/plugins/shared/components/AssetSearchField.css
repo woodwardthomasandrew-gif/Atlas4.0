@@ -1,0 +1,30 @@
+.asset-search-field {
+  position: relative;
+  max-width: 320px;
+  margin-bottom: 16px;
+}
+
+.asset-search-field .atlas-input {
+  padding-right: 32px;
+}
+
+.asset-search-field__clear {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  color: var(--atlas-text-secondary);
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.asset-search-field__clear:hover {
+  color: var(--atlas-text-primary);
+  background: var(--atlas-surface);
+}

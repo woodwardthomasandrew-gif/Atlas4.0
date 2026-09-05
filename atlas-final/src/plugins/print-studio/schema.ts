@@ -3,6 +3,7 @@ import type { AssetSchema } from "@app/plugin-api/types";
 export const PRINT_STUDIO_TYPE = "print-layout";
 
 export type PageSize = "letter" | "a4";
+export type MultiCardColumns = 1 | 2 | 3;
 
 export const PAGE_DIMENSIONS_IN: Record<PageSize, { widthIn: number; heightIn: number }> = {
   letter: { widthIn: 8.5, heightIn: 11 },
@@ -37,6 +38,8 @@ export interface PrintPage {
 
 export interface PrintLayoutData {
   pageSize: PageSize;
+  /** Number of columns used when a card renderer returns multiple panels. */
+  multiCardColumns?: MultiCardColumns;
   pages: PrintPage[];
 }
 
@@ -51,6 +54,7 @@ export function createPage(): PrintPage {
 export function createDefaultPrintLayoutData(): PrintLayoutData {
   return {
     pageSize: "letter",
+    multiCardColumns: 1,
     pages: [createPage()]
   };
 }

@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { PAGE_DIMENSIONS_IN, type CardPlacement, type PageSize, type PrintPage } from "../schema";
+import {
+  PAGE_DIMENSIONS_IN,
+  type CardPlacement,
+  type MultiCardColumns,
+  type PageSize,
+  type PrintPage
+} from "../schema";
 import { DRAG_MIME_TYPE, type DraggedCardPayload } from "./CardLibrary";
 import { PlacedCard, MIN_SIZE_IN, type MoveDragPayload, type ResizeState } from "./PlacedCard";
 import "./PageSurface.css";
@@ -10,6 +16,9 @@ const EDIT_PX_PER_IN = 72;
 export interface PageSurfaceProps {
   page: PrintPage;
   pageSize: PageSize;
+  multiCardColumns: MultiCardColumns;
+  zoom: number;
+  showGrid: boolean;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onChangePlacements: (placements: CardPlacement[]) => void;
@@ -18,6 +27,9 @@ export interface PageSurfaceProps {
 export function PageSurface({
   page,
   pageSize,
+  multiCardColumns,
+  zoom,
+  showGrid,
   selectedId,
   onSelect,
   onChangePlacements
@@ -32,8 +44,8 @@ export function PageSurface({
     if (!resizeState) return;
 
     const handleMouseMove = (e: MouseEvent): void => {
-      const dxIn = (e.clientX - resizeState.pointerStartXPx) / EDIT_PX_PER_IN;
-      const dyIn = (e.clientY - resizeState.pointerStartYPx) / EDIT_PX_PER_IN;
+      const dxIn = (e.clientX - resizeState.pointerStartXPx) / (EDIT_PX_PER_IN * zoom);
+      const dyIn = (e.clientY - resizeState.pointerStartYPx) / (EDIT_PX_PER_IN * zoom);
       const unconstrained = e.shiftKey;
 
       let { startXIn, startYIn, startWidthIn, startHeightIn, aspectRatio, corner } = resizeState;
@@ -105,8 +117,8 @@ export function PageSurface({
     if (!raw || !surfaceRef.current) return;
 
     const rect = surfaceRef.current.getBoundingClientRect();
-    const dropXIn = (e.clientX - rect.left) / EDIT_PX_PER_IN;
-    const dropYIn = (e.clientY - rect.top) / EDIT_PX_PER_IN;
+    const dropXIn = (e.clientX - rect.left) / (EDIT_PX_PER_IN * zoom);
+    const dropYIn = (e.clientY - rect.top) / (EDIT_PX_PER_IN * zoom);
 
     const payload = JSON.parse(raw) as DraggedCardPayload | MoveDragPayload;
 
@@ -127,28 +139,46 @@ export function PageSurface({
     if (payload.kind !== "new") return;
 
     // Multi-page assets (e.g. a creature whose stat block spans several
-    // cards) drop as a vertical stack of separate placements, each sized
-    // to its own page's real content instead of one guessed box.
+    // panels) can be arranged as a grid. Panels are scaled together so the
+    // requested number of columns fits the physical page width.
     const GAP_IN = 0.25;
     const newPlacements: CardPlacement[] = [];
-    let stackYIn = dropYIn - payload.pages[0].heightIn / 2;
+    const columns = Math.max(1, Math.min(multiCardColumns, payload.pages.length));
+    const cellWidthIn = (dims.widthIn - GAP_IN * (columns - 1)) / columns;
+    const gridWidthIn = cellWidthIn * columns + GAP_IN * (columns - 1);
+    const gridXIn = clamp(dropXIn - gridWidthIn / 2, 0, Math.max(0, dims.widthIn - gridWidthIn));
+    const scale = Math.min(1, cellWidthIn / Math.max(...payload.pages.map((page_) => page_.widthIn)));
+    const panelWidths = payload.pages.map((page_) => page_.widthIn * scale);
+    const panelHeights = payload.pages.map((page_) => page_.heightIn * scale);
+    const rowHeights: number[] = [];
+    for (let index = 0; index < payload.pages.length; index += columns) {
+      rowHeights.push(Math.max(...panelHeights.slice(index, index + columns)));
+    }
+    const totalHeight = rowHeights.reduce((sum, height) => sum + height, 0) + GAP_IN * (rowHeights.length - 1);
+    const stackYIn = clamp(dropYIn - totalHeight / 2, 0, Math.max(0, dims.heightIn - totalHeight));
 
-    for (const page_ of payload.pages) {
-      const xIn = clamp(dropXIn - page_.widthIn / 2, 0, Math.max(0, dims.widthIn - page_.widthIn));
-      const yIn = clamp(stackYIn, 0, Math.max(0, dims.heightIn - page_.heightIn));
+    for (let index = 0; index < payload.pages.length; index += 1) {
+      const page_ = payload.pages[index];
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      const rowOffset = rowHeights.slice(0, row).reduce((sum, height) => sum + height + GAP_IN, 0);
+      const widthIn = panelWidths[index];
+      const heightIn = panelHeights[index];
+      const cellXIn = gridXIn + column * (cellWidthIn + GAP_IN);
+      const xIn = cellXIn + (cellWidthIn - widthIn) / 2;
+      const yIn = stackYIn + rowOffset;
       newPlacements.push({
         id: crypto.randomUUID(),
         assetType: payload.assetType,
         assetId: payload.assetId,
         name: payload.name,
-        xIn,
-        yIn,
-        widthIn: page_.widthIn,
-        heightIn: page_.heightIn,
+        xIn: clamp(xIn, 0, Math.max(0, dims.widthIn - widthIn)),
+        yIn: clamp(yIn, 0, Math.max(0, dims.heightIn - heightIn)),
+        widthIn,
+        heightIn,
         rotationDeg: 0,
         cardPageIndex: page_.cardPageIndex
       });
-      stackYIn = yIn + page_.heightIn + GAP_IN;
     }
 
     onChangePlacements([...page.placements, ...newPlacements]);
@@ -157,26 +187,37 @@ export function PageSurface({
 
   return (
     <div
-      ref={surfaceRef}
-      className="page-surface"
+      className="page-surface-viewport"
       style={{
-        width: `${dims.widthIn * EDIT_PX_PER_IN}px`,
-        height: `${dims.heightIn * EDIT_PX_PER_IN}px`
+        width: `${dims.widthIn * EDIT_PX_PER_IN * zoom}px`,
+        height: `${dims.heightIn * EDIT_PX_PER_IN * zoom}px`
       }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       onClick={() => onSelect(null)}
     >
-      {page.placements.map((placement) => (
-        <PlacedCard
-          key={placement.id}
-          placement={placement}
-          pxPerIn={EDIT_PX_PER_IN}
-          selected={placement.id === selectedId}
-          onSelect={() => onSelect(placement.id)}
-          onResizeStart={setResizeState}
-        />
-      ))}
+      <div
+        ref={surfaceRef}
+        className="page-surface"
+        style={{
+          width: `${dims.widthIn * EDIT_PX_PER_IN}px`,
+          height: `${dims.heightIn * EDIT_PX_PER_IN}px`,
+          transform: `scale(${zoom})`
+        }}
+      >
+        {showGrid && <div className="page-surface__grid" aria-hidden="true" />}
+        {page.placements.map((placement) => (
+          <PlacedCard
+            key={placement.id}
+            placement={placement}
+            pxPerIn={EDIT_PX_PER_IN}
+            zoom={zoom}
+            selected={placement.id === selectedId}
+            onSelect={() => onSelect(placement.id)}
+            onResizeStart={setResizeState}
+          />
+        ))}
+      </div>
     </div>
   );
 }

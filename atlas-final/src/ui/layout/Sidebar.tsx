@@ -37,6 +37,9 @@ export function Sidebar(): JSX.Element {
           </li>
         ))}
       </ul>
+      <div className="atlas-sidebar__footer">
+        <NavLink to="/settings" className="atlas-sidebar__link">Settings</NavLink>
+      </div>
     </nav>
   );
 }

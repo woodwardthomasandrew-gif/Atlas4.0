@@ -27,6 +27,19 @@
   padding: 6px 8px;
 }
 
+.print-studio-editor__zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.print-studio-editor__zoom-value {
+  min-width: 48px;
+  color: var(--atlas-text-primary);
+  font-size: 12px;
+  text-align: center;
+}
+
 .print-studio-editor__page-tabs {
   display: flex;
   gap: 6px;
@@ -69,6 +82,7 @@
 .print-studio-editor__canvas-scroll {
   overflow: auto;
   max-width: 100%;
+  max-height: calc(100vh - 260px);
   padding: 12px;
   background: #0f1012;
   border-radius: var(--atlas-radius-sm);

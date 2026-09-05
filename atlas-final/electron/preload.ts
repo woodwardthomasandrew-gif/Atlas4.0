@@ -14,7 +14,10 @@ const atlasBridge = {
       ipcRenderer.invoke("atlas:db:run", sql, params)
   },
   app: {
-    getVersion: () => ipcRenderer.invoke("atlas:app:getVersion")
+    getVersion: () => ipcRenderer.invoke("atlas:app:getVersion"),
+    printPdf: (pdf: Uint8Array) => ipcRenderer.invoke("atlas:app:print-pdf", pdf),
+    onRequestSave: (listener: () => void | Promise<void>) => { const handler = (): void => { void listener(); }; ipcRenderer.on("atlas:app:request-save", handler); return () => ipcRenderer.removeListener("atlas:app:request-save", handler); },
+    saveComplete: () => ipcRenderer.invoke("atlas:app:save-complete")
   }
 };
 

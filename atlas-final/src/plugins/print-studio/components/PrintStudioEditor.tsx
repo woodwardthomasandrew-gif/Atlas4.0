@@ -1,15 +1,27 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { AssetEditorProps } from "@app/plugin-api/types";
 import { Button } from "@ui/components";
-import { createPage, type CardPlacement, type PageSize, type PrintLayoutData } from "../schema";
+import {
+  createPage,
+  type CardPlacement,
+  type MultiCardColumns,
+  type PageSize,
+  type PrintLayoutData,
+  PAGE_DIMENSIONS_IN
+} from "../schema";
 import { CardLibrary } from "./CardLibrary";
 import { PageSurface } from "./PageSurface";
 import { PlacementInspector } from "./PlacementInspector";
 import "./PrintStudioEditor.css";
 
+const ZOOM_LEVELS = [25, 50, 75, 100, 125, 150, 200];
+
 export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayoutData>): JSX.Element {
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showGrid, setShowGrid] = useState(true);
+  const [zoom, setZoom] = useState(100);
+  const canvasScrollRef = useRef<HTMLDivElement>(null);
 
   const activePage = data.pages[activePageIndex] ?? data.pages[0];
 
@@ -50,6 +62,36 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
     updatePlacements([...rest, selectedPlacement]);
   };
 
+  const changeZoom = (direction: -1 | 1): void => {
+    if (direction < 0) {
+      const previous = [...ZOOM_LEVELS].reverse().find((level) => level < zoom);
+      setZoom(previous ?? ZOOM_LEVELS[0]);
+    } else {
+      const next = ZOOM_LEVELS.find((level) => level > zoom);
+      setZoom(next ?? ZOOM_LEVELS[ZOOM_LEVELS.length - 1]);
+    }
+  };
+
+  const fitToView = (): void => {
+    const viewport = canvasScrollRef.current;
+    if (!viewport) return;
+    const dims = PAGE_DIMENSIONS_IN[data.pageSize];
+    const availableWidth = Math.max(0, viewport.clientWidth - 24);
+    const availableHeight = Math.max(0, viewport.clientHeight - 24);
+    const fitPercent = Math.min(
+      (availableWidth / (dims.widthIn * 72)) * 100,
+      (availableHeight / (dims.heightIn * 72)) * 100
+    );
+    const fitLevel = ZOOM_LEVELS.filter((level) => level <= fitPercent).pop();
+    setZoom(fitLevel ?? ZOOM_LEVELS[0]);
+  };
+
+  const handleCanvasWheel = (e: React.WheelEvent<HTMLDivElement>): void => {
+    if (!e.ctrlKey || e.deltaY === 0) return;
+    e.preventDefault();
+    changeZoom(e.deltaY < 0 ? 1 : -1);
+  };
+
   if (!activePage) return <p>No pages.</p>;
 
   return (
@@ -63,6 +105,41 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
           >
             <option value="letter">US Letter</option>
             <option value="a4">A4</option>
+          </select>
+        </label>
+
+        <Button
+          variant="secondary"
+          aria-pressed={showGrid}
+          onClick={() => setShowGrid((visible) => !visible)}
+        >
+          Grid: {showGrid ? "ON" : "OFF"}
+        </Button>
+
+        <div className="print-studio-editor__zoom-controls" aria-label="Canvas zoom controls">
+          <Button variant="secondary" aria-label="Zoom out" onClick={() => changeZoom(-1)} disabled={zoom === 25}>
+            −
+          </Button>
+          <span className="print-studio-editor__zoom-value">{zoom}%</span>
+          <Button variant="secondary" aria-label="Zoom in" onClick={() => changeZoom(1)} disabled={zoom === 200}>
+            +
+          </Button>
+          <Button variant="secondary" onClick={fitToView}>
+            Fit to view
+          </Button>
+        </div>
+
+        <label className="print-studio-editor__page-size">
+          <span>Multi-panel columns</span>
+          <select
+            value={data.multiCardColumns ?? 1}
+            onChange={(e) =>
+              onChange({ ...data, multiCardColumns: Number(e.target.value) as MultiCardColumns })
+            }
+          >
+            <option value={1}>1 (stack)</option>
+            <option value={2}>2 columns</option>
+            <option value={3}>3 columns</option>
           </select>
         </label>
 
@@ -102,10 +179,17 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
       <div className="print-studio-editor__workspace">
         <CardLibrary />
 
-        <div className="print-studio-editor__canvas-scroll">
+        <div
+          ref={canvasScrollRef}
+          className="print-studio-editor__canvas-scroll"
+          onWheel={handleCanvasWheel}
+        >
           <PageSurface
             page={activePage}
             pageSize={data.pageSize}
+            multiCardColumns={data.multiCardColumns ?? 1}
+            zoom={zoom / 100}
+            showGrid={showGrid}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onChangePlacements={updatePlacements}

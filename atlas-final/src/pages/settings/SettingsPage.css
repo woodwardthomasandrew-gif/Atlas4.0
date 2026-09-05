@@ -1,0 +1,11 @@
+.atlas-settings { max-width: 840px; margin: 0 auto; padding: 32px; }
+.atlas-settings__section { margin-top: 24px; padding: 20px; border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-md); background: var(--atlas-surface); }
+.atlas-settings__section h2 { margin-top: 0; }
+.atlas-settings__muted { color: var(--atlas-text-secondary); }
+.atlas-settings__shortcuts { margin: 16px 0 0; }
+.atlas-settings__shortcuts div { display: flex; justify-content: space-between; gap: 24px; padding: 9px 0; border-bottom: 1px solid var(--atlas-border); }
+.atlas-settings__shortcuts div:last-child { border-bottom: 0; }
+.atlas-settings__shortcuts dt { font-weight: 500; }
+.atlas-settings__shortcuts dd { margin: 0; color: var(--atlas-text-secondary); font-family: var(--atlas-font-mono); }
+.atlas-settings__field { display: flex; align-items: center; justify-content: space-between; max-width: 420px; gap: 24px; }
+.atlas-settings__field input { width: 90px; padding: 8px; color: var(--atlas-text); background: var(--atlas-background); border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-sm); }

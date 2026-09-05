@@ -29,6 +29,7 @@ export interface ResizeState {
 export interface PlacedCardProps {
   placement: CardPlacement;
   pxPerIn: number;
+  zoom: number;
   selected: boolean;
   onSelect: () => void;
   onResizeStart?: (state: ResizeState) => void;
@@ -36,7 +37,7 @@ export interface PlacedCardProps {
 
 const MIN_SIZE_IN = 0.25;
 
-export function PlacedCard({ placement, pxPerIn, selected, onSelect, onResizeStart }: PlacedCardProps): JSX.Element {
+export function PlacedCard({ placement, pxPerIn, zoom, selected, onSelect, onResizeStart }: PlacedCardProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [record, setRecord] = useState<{ name: string; data: unknown } | null>(null);
   const [renderSize, setRenderSize] = useState<{ width: number; height: number } | null>(null);
@@ -89,8 +90,8 @@ export function PlacedCard({ placement, pxPerIn, selected, onSelect, onResizeSta
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>): void => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const grabOffsetXIn = (e.clientX - rect.left) / pxPerIn;
-    const grabOffsetYIn = (e.clientY - rect.top) / pxPerIn;
+    const grabOffsetXIn = (e.clientX - rect.left) / (pxPerIn * zoom);
+    const grabOffsetYIn = (e.clientY - rect.top) / (pxPerIn * zoom);
     const payload: MoveDragPayload = {
       kind: "move",
       placementId: placement.id,

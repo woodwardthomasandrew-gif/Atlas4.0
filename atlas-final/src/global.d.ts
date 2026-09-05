@@ -14,6 +14,9 @@ interface AtlasBridge {
   };
   app: {
     getVersion: () => Promise<string>;
+    printPdf: (pdf: Uint8Array) => Promise<void>;
+    onRequestSave: (listener: () => void | Promise<void>) => () => void;
+    saveComplete: () => Promise<void>;
   };
 }
 

@@ -1,0 +1,1 @@
+.atlas-save-notification { position: fixed; right: 24px; bottom: 24px; z-index: 100; padding: 10px 16px; border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-md); background: var(--atlas-surface); color: var(--atlas-text); box-shadow: 0 8px 24px rgb(0 0 0 / 25%); }

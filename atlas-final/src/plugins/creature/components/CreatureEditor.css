@@ -70,6 +70,16 @@
   color: var(--atlas-text-primary);
 }
 
+.creature-editor__derived-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.creature-editor__derived-row .creature-editor__calculated {
+  flex: 0 0 auto;
+}
+
 .creature-editor__speed-row {
   display: flex;
   gap: 10px;

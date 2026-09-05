@@ -4,6 +4,9 @@ import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
 import { deleteAsset, saveAsset } from "@app/db/assetStore";
 import { PRINT_STUDIO_TYPE, type PrintLayoutData } from "../schema";
+import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
+import { useHistoryState } from "@app/shortcuts/useHistoryState";
+import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
 import "./PrintStudioEditPage.css";
 
 function generateId(): string {
@@ -28,12 +31,12 @@ export function PrintStudioEditPage(): JSX.Element {
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
   const [name, setName] = useState("");
-  const [data, setData] = useState<PrintLayoutData>(
-    () => definition.createDefaultData() as PrintLayoutData
-  );
+  const [data, setData, undo, redo] = useHistoryState<PrintLayoutData>(definition.createDefaultData() as PrintLayoutData);
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
   const [exporting, setExporting] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const { notifySaved } = useSaveContext();
 
   useEffect(() => {
     if (isNew) return;
@@ -49,26 +52,33 @@ export function PrintStudioEditPage(): JSX.Element {
       });
   }, [assetId, isNew]);
 
-  const handleSave = async (): Promise<void> => {
+  const saveCurrent = async (reason: SaveReason): Promise<boolean> => {
     const result = definition.validate(data);
-    if (!result.valid) {
+    if (reason === "manual" && !result.valid) {
       setErrors(result.errors.map((e) => e.message));
-      return;
+      return false;
     }
-    if (!name.trim()) {
+    if (reason === "manual" && !name.trim()) {
       setErrors(["Name is required."]);
-      return;
+      return false;
     }
 
     setErrors([]);
     await saveAsset({ id: assetId, type: PRINT_STUDIO_TYPE, name, data });
-    navigate("/print-studio");
+    return true;
+  };
+  const handleSave = async (): Promise<void> => {
+    if (await saveCurrent("manual")) { notifySaved("manual"); navigate("/print-studio"); }
   };
 
   const handleDelete = async (): Promise<void> => {
     await deleteAsset(assetId);
     navigate("/print-studio");
   };
+  useShortcutAction("save", handleSave, loaded);
+  useAutosave(saveCurrent, loaded);
+  useShortcutAction("undo", undo, loaded);
+  useShortcutAction("redo", redo, loaded);
 
   const handleExport = async (exporterId: string): Promise<void> => {
     const exporter = definition.exporters.find((e) => e.id === exporterId);
@@ -85,6 +95,23 @@ export function PrintStudioEditPage(): JSX.Element {
       URL.revokeObjectURL(url);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handlePrint = async (): Promise<void> => {
+    setPrinting(true);
+    setErrors([]);
+    try {
+      const pdfExporter = definition.exporters.find((exporter) => exporter.id === "pdf");
+      const output = await pdfExporter?.export(data, name);
+      if (!(output instanceof Uint8Array)) {
+        throw new Error("Unable to prepare the print-ready PDF.");
+      }
+      await window.atlas.app.printPdf(output);
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : "Printing failed."]);
+    } finally {
+      setPrinting(false);
     }
   };
 
@@ -108,10 +135,15 @@ export function PrintStudioEditPage(): JSX.Element {
           )}
           {!isNew &&
             definition.exporters.map((exporter) => (
-              <Button key={exporter.id} disabled={exporting} onClick={() => handleExport(exporter.id)}>
+              <Button key={exporter.id} disabled={exporting || printing} onClick={() => handleExport(exporter.id)}>
                 {exporting ? "Exporting…" : `Export ${exporter.label}`}
               </Button>
             ))}
+          {!isNew && (
+            <Button variant="primary" disabled={exporting || printing} onClick={handlePrint}>
+              {printing ? "Preparing…" : "Print"}
+            </Button>
+          )}
           <Button variant="primary" onClick={handleSave}>
             Save
           </Button>
