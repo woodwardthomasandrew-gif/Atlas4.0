@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { getAsset } from "@app/db/assetStore";
+import { getComponent, type ComponentRecord } from "@app/db/componentStore";
 import { getAllAssetTypes } from "@app/registry/assetRegistry";
 import type { CardPlacement } from "../schema";
 import { DRAG_MIME_TYPE } from "./CardLibrary";
 import "./PlacedCard.css";
+import { renderComponentCard } from "@plugins/trait/cardRenderer";
 
 export interface MoveDragPayload {
   kind: "move";
@@ -40,27 +42,35 @@ const MIN_SIZE_IN = 0.25;
 export function PlacedCard({ placement, pxPerIn, zoom, selected, onSelect, onResizeStart }: PlacedCardProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [record, setRecord] = useState<{ name: string; data: unknown } | null>(null);
+  const [component, setComponent] = useState<ComponentRecord | null>(null);
   const [renderSize, setRenderSize] = useState<{ width: number; height: number } | null>(null);
-  const definition = getAllAssetTypes().find((d) => d.type === placement.assetType);
+  const definition = placement.sourceKind === "component" ? undefined : getAllAssetTypes().find((d) => d.type === placement.assetType);
 
   useEffect(() => {
     let cancelled = false;
-    getAsset(placement.assetId).then((row) => {
-      if (!cancelled && row) setRecord({ name: row.name, data: row.data });
-    });
+    setRecord(null);
+    setComponent(null);
+    if (placement.sourceKind === "component") {
+      getComponent(placement.assetId).then((row) => { if (!cancelled) setComponent(row); });
+    } else {
+      getAsset(placement.assetId).then((row) => { if (!cancelled && row) setRecord({ name: row.name, data: row.data }); });
+    }
     return () => {
       cancelled = true;
     };
-  }, [placement.assetId]);
+  }, [placement.assetId, placement.sourceKind]);
 
   useEffect(() => {
-    if (!record || !canvasRef.current) return;
+    if ((!record && !component) || !canvasRef.current) return;
     const pageIndex = placement.cardPageIndex ?? 0;
 
     let sourceCanvas: HTMLCanvasElement | null = null;
-    if (definition?.renderCardToCanvases) {
+    if (component) {
+      sourceCanvas = document.createElement("canvas");
+      renderComponentCard(sourceCanvas, component);
+    } else if (record && definition?.renderCardToCanvases) {
       sourceCanvas = definition.renderCardToCanvases(record.name, record.data)[pageIndex] ?? null;
-    } else if (definition?.renderCardToCanvas) {
+    } else if (record && definition?.renderCardToCanvas) {
       sourceCanvas = document.createElement("canvas");
       definition.renderCardToCanvas(sourceCanvas, record.name, record.data);
     }
@@ -72,7 +82,7 @@ export function PlacedCard({ placement, pxPerIn, zoom, selected, onSelect, onRes
     const ctx = target.getContext("2d");
     ctx?.drawImage(sourceCanvas, 0, 0);
     setRenderSize({ width: sourceCanvas.width, height: sourceCanvas.height });
-  }, [definition, record, placement.cardPageIndex]);
+  }, [component, definition, record, placement.cardPageIndex]);
 
   // Scale the canvas to *fit inside* the placement box, preserving its
   // real aspect ratio, instead of stretching it to fill the box (which is

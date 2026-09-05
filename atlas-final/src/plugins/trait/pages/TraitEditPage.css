@@ -1,0 +1,8 @@
+.trait-edit { padding: 1.5rem; }
+.trait-edit__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+.trait-edit__header h1 { margin: 0; }
+.trait-edit__kicker { color: var(--atlas-text-secondary); margin: 0 0 .25rem; font-size: .8rem; }
+.trait-edit__actions { display: flex; gap: .5rem; }
+.trait-edit__notice, .trait-edit__error { margin-bottom: 1rem; }
+.trait-edit__notice { border-color: var(--atlas-accent); color: var(--atlas-text-secondary); }
+.trait-edit__error { border-color: var(--atlas-danger); color: var(--atlas-danger); }

@@ -1,0 +1,11 @@
+.trait-editor { display: grid; gap: 1rem; max-width: 720px; }
+.trait-editor label { display: grid; gap: .35rem; }
+.trait-editor label > span { color: var(--atlas-text-secondary); font-size: .85rem; }
+.trait-editor textarea, .trait-editor select { background: var(--atlas-surface); border: 1px solid var(--atlas-border); border-radius: 6px; color: var(--atlas-text-primary); padding: .65rem; font: inherit; }
+.trait-editor__mechanics { border-top: 1px solid var(--atlas-border); padding-top: 1rem; }
+.trait-editor__section-heading { display: flex; align-items: baseline; gap: .6rem; }
+.trait-editor__section-heading h3 { margin: 0; }
+.trait-editor__section-heading span { color: var(--atlas-text-secondary); font-size: .8rem; }
+.trait-editor__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: .75rem; }
+.trait-editor__checkbox { display: flex !important; align-items: center; gap: .5rem; }
+.trait-editor__readonly { color: var(--atlas-text-secondary); font-style: italic; }

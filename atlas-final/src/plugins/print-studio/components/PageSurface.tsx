@@ -177,7 +177,9 @@ export function PageSurface({
         widthIn,
         heightIn,
         rotationDeg: 0,
-        cardPageIndex: page_.cardPageIndex
+        cardPageIndex: page_.cardPageIndex,
+        sourceKind: payload.sourceKind,
+        componentType: payload.componentType
       });
     }
 

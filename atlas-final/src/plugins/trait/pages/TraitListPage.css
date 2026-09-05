@@ -1,0 +1,17 @@
+.trait-list { padding: 1.5rem; }
+.trait-list__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+.trait-list__header h1 { margin: 0; }
+.trait-list__kicker { color: var(--text-secondary); margin: 0 0 .25rem; font-size: .8rem; }
+.trait-list__controls { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(120px, 1fr)); gap: .6rem; margin-bottom: 1.25rem; }
+.trait-list__controls select { background: var(--atlas-surface); border: 1px solid var(--atlas-border); border-radius: 6px; color: var(--atlas-text-primary); padding: .55rem; }
+.trait-list__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+.trait-list__card { display: grid; gap: .45rem; }
+.trait-list__card-heading { display: flex; justify-content: space-between; gap: .5rem; align-items: center; }
+.trait-list__card-heading a { color: var(--atlas-text-primary); text-decoration: none; }
+.trait-list__custom { border-color: var(--atlas-accent); }
+.trait-list__category { color: var(--atlas-accent); font-size: .8rem; }
+.trait-list__card p { color: var(--atlas-text-secondary); margin: 0; line-height: 1.4; }
+.trait-list__tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+.trait-list__tags span { background: var(--atlas-surface); border: 1px solid var(--atlas-border); border-radius: 999px; padding: .15rem .45rem; font-size: .75rem; }
+.trait-list__actions { display: flex; justify-content: flex-end; gap: .35rem; margin-top: .35rem; }
+@media (max-width: 900px) { .trait-list__controls { grid-template-columns: 1fr 1fr; } }

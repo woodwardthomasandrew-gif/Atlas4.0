@@ -28,14 +28,23 @@ interface ComponentPayload {
  * component.id, so later edits to the entry or to the library component
  * can never affect one another.
  */
-function entryFromComponent(component: ComponentRecord): CreatureAbilityEntry {
+export function entryFromComponent(component: ComponentRecord): CreatureAbilityEntry {
   const payload = (component.data ?? {}) as Partial<ComponentPayload>;
+  const damage = payload.damage;
   return {
     id: crypto.randomUUID(),
     name: component.name,
     description: component.description,
     attackBonus: payload.attackBonus ?? null,
-    damage: payload.damage ? { ...payload.damage } : null,
+    damage:
+      damage && typeof damage === "object"
+        ? {
+            diceCount: typeof damage.diceCount === "number" ? damage.diceCount : 1,
+            diceType: DAMAGE_DIE_TYPES.includes(damage.diceType) ? damage.diceType : "d6",
+            bonus: typeof damage.bonus === "number" ? damage.bonus : 0,
+            damageType: DAMAGE_TYPES.includes(damage.damageType) ? damage.damageType : "slashing"
+          }
+        : null,
     saveDC: payload.saveDC ?? null,
     extraAttacksCount: payload.extraAttacksCount ?? null
   };

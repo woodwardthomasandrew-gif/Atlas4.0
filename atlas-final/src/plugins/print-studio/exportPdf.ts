@@ -1,7 +1,9 @@
 import { jsPDF } from "jspdf";
 import { getAsset } from "@app/db/assetStore";
+import { getComponent } from "@app/db/componentStore";
 import { getAllAssetTypes } from "@app/registry/assetRegistry";
 import type { PrintLayoutData } from "./schema";
+import { renderComponentCard } from "@plugins/trait/cardRenderer";
 
 export async function exportPrintLayoutToPdf(data: PrintLayoutData): Promise<Uint8Array> {
   const format = data.pageSize === "letter" ? "letter" : "a4";
@@ -16,6 +18,18 @@ export async function exportPrintLayoutToPdf(data: PrintLayoutData): Promise<Uin
 
     for (const placement of page.placements) {
       const definition = getAllAssetTypes().find((d) => d.type === placement.assetType);
+      if (placement.sourceKind === "component") {
+        const component = await getComponent(placement.assetId);
+        if (!component) continue;
+        const canvas = document.createElement("canvas");
+        renderComponentCard(canvas, component);
+        const dataUrl = canvas.toDataURL("image/png");
+        const scale = Math.min(placement.widthIn / canvas.width, placement.heightIn / canvas.height);
+        const drawWidthIn = canvas.width * scale;
+        const drawHeightIn = canvas.height * scale;
+        pdf.addImage(dataUrl, "PNG", placement.xIn + (placement.widthIn - drawWidthIn) / 2, placement.yIn + (placement.heightIn - drawHeightIn) / 2, drawWidthIn, drawHeightIn, undefined, undefined, placement.rotationDeg);
+        continue;
+      }
       if (!definition?.renderCardToCanvas && !definition?.renderCardToCanvases) continue;
 
       const record = await getAsset(placement.assetId);

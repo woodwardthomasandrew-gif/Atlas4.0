@@ -136,3 +136,17 @@ export async function deleteCustomComponent(id: string): Promise<void> {
   }
   await window.atlas.db.run("DELETE FROM components WHERE id = ?", [id]);
 }
+
+/** Creates an independent custom copy of either a built-in or custom component. */
+export async function duplicateComponent(id: string, nameSuffix = " (Copy)"): Promise<ComponentRecord> {
+  const original = await getComponent(id);
+  if (!original) throw new Error(`Cannot duplicate component: "${id}" not found.`);
+
+  return saveCustomComponent({
+    componentType: original.componentType,
+    name: `${original.name}${nameSuffix}`,
+    description: original.description,
+    tags: [...original.tags],
+    data: JSON.parse(JSON.stringify(original.data))
+  });
+}

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listAssets, type AssetRecord } from "@app/db/assetStore";
+import { listComponents, type ComponentRecord } from "@app/db/componentStore";
 import { filterAssetsByName } from "@app/search/assetSearch";
 import { getAllAssetTypes } from "@app/registry/assetRegistry";
 import { AssetSearchField } from "@plugins/shared/components/AssetSearchField";
+import { renderComponentCard } from "@plugins/trait/cardRenderer";
 import "./CardLibrary.css";
 
 export const DRAG_MIME_TYPE = "application/x-atlas-card";
@@ -38,6 +40,8 @@ export interface DraggedCardPayload {
   name: string;
   /** One entry per physical card the asset renders to (usually 1; more for paginated content). */
   pages: DraggedCardPage[];
+  sourceKind?: "asset" | "component";
+  componentType?: string;
 }
 
 /**
@@ -93,6 +97,7 @@ export function CardLibrary(): JSX.Element {
   const [expandedByType, setExpandedByType] = useState<CategoryExpansionState>(
     readCategoryExpansionState
   );
+  const [traitComponents, setTraitComponents] = useState<ComponentRecord[]>([]);
 
   const placeableTypes = getAllAssetTypes().filter((d) => d.renderCardToCanvas && d.cardSize);
 
@@ -104,6 +109,7 @@ export function CardLibrary(): JSX.Element {
         setRecordsByType(Object.fromEntries(pairs));
       }
     );
+    listComponents("trait").then(setTraitComponents);
     return () => {
       cancelled = true;
     };
@@ -125,10 +131,16 @@ export function CardLibrary(): JSX.Element {
       ),
     [recordsByType, query]
   );
+  const filteredTraits = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return traitComponents;
+    return traitComponents.filter((trait) => trait.name.toLowerCase().includes(q) || trait.description.toLowerCase().includes(q) || trait.tags.some((tag) => tag.toLowerCase().includes(q)));
+  }, [traitComponents, query]);
   const totalFilteredRecords = Object.values(filteredRecordsByType).reduce(
     (count, records) => count + records.length,
     0
   );
+  const totalFilteredCards = totalFilteredRecords + filteredTraits.length;
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -149,15 +161,23 @@ export function CardLibrary(): JSX.Element {
     e.dataTransfer.effectAllowed = "copy";
   };
 
-  if (placeableTypes.length === 0) {
+  const handleTraitDragStart = (e: React.DragEvent<HTMLDivElement>, component: ComponentRecord): void => {
+    const canvas = document.createElement("canvas");
+    renderComponentThumbnail(canvas, component);
+    const widthIn = 3.5;
+    e.dataTransfer.setData(DRAG_MIME_TYPE, JSON.stringify({ kind: "new", assetType: "component", assetId: component.id, name: component.name, pages: [{ cardPageIndex: 0, widthIn, heightIn: widthIn * (canvas.height / canvas.width) }], sourceKind: "component", componentType: component.componentType } satisfies DraggedCardPayload));
+    e.dataTransfer.effectAllowed = "copy";
+  };
+
+  if (placeableTypes.length === 0 && traitComponents.length === 0) {
     return <p className="card-library__note">No card-producing plugins are installed yet.</p>;
   }
 
   return (
     <div className="card-library">
       <AssetSearchField value={query} onChange={setQuery} />
-      {query.trim().length > 0 && totalFilteredRecords === 0 && (
-        <p className="card-library__note">No saved assets found. Try a different name or clear the search.</p>
+      {query.trim().length > 0 && totalFilteredCards === 0 && (
+        <p className="card-library__note">No matching cards found. Try a different search or clear the search.</p>
       )}
       {placeableTypes.map((definition) => {
         const allRecords = recordsByType[definition.type] ?? [];
@@ -205,6 +225,28 @@ export function CardLibrary(): JSX.Element {
           </div>
         );
       })}
+      <div className="card-library__group">
+        {(() => {
+          const expanded = query.trim().length > 0 || expandedByType["component:trait"] !== false;
+          const traits = query.trim() ? filteredTraits : traitComponents;
+          return <>
+            <button type="button" className="card-library__category-toggle" aria-expanded={expanded} onClick={() => setExpandedByType((current) => ({ ...current, "component:trait": !expanded }))}><span className="card-library__category-chevron">{expanded ? "▼" : "▶"}</span><span>Traits</span><span className="card-library__category-count">({traitComponents.length})</span></button>
+            {expanded && (traits.length === 0 ? <p className="card-library__note">No saved traits.</p> : <div className="card-library__grid">{traits.map((component) => <div key={component.id} className="card-library__item" draggable onDragStart={(e) => handleTraitDragStart(e, component)} title={`${component.name} (${component.isBuiltin ? "Built-in" : "Custom"})`}><ComponentThumbnail component={component} /><span className="card-library__item-name">{component.name}</span></div>)}</div>)}
+          </>;
+        })()}
+      </div>
     </div>
   );
+}
+
+function renderComponentThumbnail(canvas: HTMLCanvasElement, component: ComponentRecord): void {
+  // Local import keeps CardLibrary's existing asset flow unchanged while sharing the same renderer.
+  const definitionCanvas = canvas;
+  renderComponentCard(definitionCanvas, component);
+}
+
+function ComponentThumbnail({ component }: { component: ComponentRecord }): JSX.Element {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => { if (canvasRef.current) renderComponentThumbnail(canvasRef.current, component); }, [component]);
+  return <canvas ref={canvasRef} className="card-library__thumb-canvas" />;
 }

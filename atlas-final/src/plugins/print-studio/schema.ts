@@ -29,6 +29,9 @@ export interface CardPlacement {
    * implement the single-canvas renderCardToCanvas.
    */
   cardPageIndex?: number;
+  /** Component-backed cards use componentStore instead of the assets table. */
+  sourceKind?: "asset" | "component";
+  componentType?: string;
 }
 
 export interface PrintPage {

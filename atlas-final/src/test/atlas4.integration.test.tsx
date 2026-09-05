@@ -216,6 +216,55 @@ describe("Atlas 4.0 — reusable components & duplication (Part 1-2)", () => {
     ).rejects.toThrow(/built-in/i);
   });
 
+  it("keeps library inserts independent across multiple creatures and handles incomplete payloads", async () => {
+    const { entryFromComponent } = await import("@plugins/creature/components/AbilityEntryList");
+    const { getComponent, saveCustomComponent, deleteCustomComponent } = await import("@app/db/componentStore");
+
+    const library = await saveCustomComponent({
+      componentType: "trait",
+      name: "Shared Ward",
+      description: "The creature gains a ward.",
+      tags: ["defense"],
+      data: {}
+    });
+    const creatureA = entryFromComponent(library);
+    const creatureB = entryFromComponent(library);
+
+    // Each insertion receives its own ID and starts with the same copied text.
+    expect(creatureA.id).not.toBe(creatureB.id);
+    expect(creatureA.description).toBe("The creature gains a ward.");
+    expect(creatureA.attackBonus).toBeNull();
+    expect(creatureA.damage).toBeNull();
+
+    // Updating the library does not alter either already-inserted creature copy.
+    await saveCustomComponent({
+      id: library.id,
+      componentType: "trait",
+      name: "Shared Ward",
+      description: "The ward is strengthened.",
+      tags: ["defense", "updated"],
+      data: { attackBonus: 5, damage: { diceCount: 2, diceType: "d8", bonus: 3, damageType: "force" } }
+    });
+    expect(creatureA.description).toBe("The creature gains a ward.");
+    expect(creatureB.description).toBe("The creature gains a ward.");
+
+    creatureA.description = "Creature A customizes its ward.";
+    expect(creatureB.description).toBe("The creature gains a ward.");
+    expect((await getComponent(library.id))?.description).toBe("The ward is strengthened.");
+
+    // Deleting the template does not affect embedded copies; a later insert gets current content.
+    await deleteCustomComponent(library.id);
+    expect(creatureA.name).toBe("Shared Ward");
+    expect(creatureB.name).toBe("Shared Ward");
+    const creatureC = entryFromComponent({
+      ...library,
+      description: "The ward is strengthened.",
+      data: { attackBonus: 5, damage: { diceCount: 2, diceType: "d8", bonus: 3, damageType: "force" } }
+    });
+    expect(creatureC.description).toBe("The ward is strengthened.");
+    expect(creatureC.damage).toEqual({ diceCount: 2, diceType: "d8", bonus: 3, damageType: "force" });
+  });
+
   it("duplicates a creature asset as a fully independent copy and opens it in the editor", async () => {
     const { getAsset } = await import("@app/db/assetStore");
     const { DuplicateAssetButton } = await import(

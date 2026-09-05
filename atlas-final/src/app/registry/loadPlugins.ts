@@ -10,6 +10,7 @@ import { registerMagicItemPlugin } from "@plugins/magic-item";
 import { registerCreaturePlugin } from "@plugins/creature";
 import { registerSpellPlugin } from "@plugins/spell";
 import { registerPrintStudioPlugin } from "@plugins/print-studio";
+import { registerTraitStudioPlugin } from "@plugins/trait";
 import { registerSearchProvider } from "@app/search/searchRegistry";
 import { listAssets } from "@app/db/assetStore";
 import { getNavItems } from "@app/navigation/navRegistry";
@@ -19,6 +20,7 @@ export function loadPlugins(): void {
   registerCreaturePlugin();
   registerSpellPlugin();
   registerPrintStudioPlugin();
+  registerTraitStudioPlugin();
   registerSearchProvider("assets", async (query) => {
     const term = query.trim().toLowerCase();
     if (!term) return [];
