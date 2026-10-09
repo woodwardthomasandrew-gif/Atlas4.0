@@ -24,6 +24,7 @@ import { AbilityEntryList } from "./AbilityEntryList";
 import { SpellcastingFields } from "./SpellcastingFields";
 import { InventoryList } from "./InventoryList";
 import { LootTableList } from "./LootTableList";
+import { CreatureAnalysisPanel } from "./CreatureAnalysisPanel";
 import "./CreatureEditor.css";
 
 export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData>): JSX.Element {
@@ -55,6 +56,10 @@ export function CreatureEditor({ data, onChange }: AssetEditorProps<CreatureData
 
   return (
     <div className="creature-editor">
+      <CollapsibleSection title="Creature Analysis">
+        <CreatureAnalysisPanel data={data} />
+      </CollapsibleSection>
+
       {/* Basic Information */}
       <section className="creature-editor__section">
         <h2>Basic Information</h2>

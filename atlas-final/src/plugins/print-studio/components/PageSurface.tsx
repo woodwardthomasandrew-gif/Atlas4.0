@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  PAGE_DIMENSIONS_IN,
   type CardPlacement,
   type MultiCardColumns,
   type PageSize,
-  type PrintPage
+  type PageOrientation,
+  type PrintPage,
+  getPageDimensionsIn
 } from "../schema";
 import { DRAG_MIME_TYPE, type DraggedCardPayload } from "./CardLibrary";
 import { PlacedCard, MIN_SIZE_IN, type MoveDragPayload, type ResizeState } from "./PlacedCard";
@@ -16,6 +17,7 @@ const EDIT_PX_PER_IN = 72;
 export interface PageSurfaceProps {
   page: PrintPage;
   pageSize: PageSize;
+  orientation: PageOrientation;
   multiCardColumns: MultiCardColumns;
   zoom: number;
   showGrid: boolean;
@@ -27,6 +29,7 @@ export interface PageSurfaceProps {
 export function PageSurface({
   page,
   pageSize,
+  orientation,
   multiCardColumns,
   zoom,
   showGrid,
@@ -35,7 +38,7 @@ export function PageSurface({
   onChangePlacements
 }: PageSurfaceProps): JSX.Element {
   const surfaceRef = useRef<HTMLDivElement>(null);
-  const dims = PAGE_DIMENSIONS_IN[pageSize];
+  const dims = getPageDimensionsIn(pageSize, orientation);
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const placementsRef = useRef(page.placements);
   placementsRef.current = page.placements;

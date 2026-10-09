@@ -8,4 +8,6 @@
 .atlas-settings__shortcuts dt { font-weight: 500; }
 .atlas-settings__shortcuts dd { margin: 0; color: var(--atlas-text-secondary); font-family: var(--atlas-font-mono); }
 .atlas-settings__field { display: flex; align-items: center; justify-content: space-between; max-width: 420px; gap: 24px; }
-.atlas-settings__field input { width: 90px; padding: 8px; color: var(--atlas-text); background: var(--atlas-background); border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-sm); }
+.atlas-settings__field input, .atlas-settings__field select { min-width: 180px; padding: 8px; color: var(--atlas-text-primary); background: var(--atlas-surface-raised); border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-sm); }
+.atlas-settings__field input[type="number"] { width: 90px; min-width: 0; }
+.atlas-settings__field input[type="time"] { width: 180px; }

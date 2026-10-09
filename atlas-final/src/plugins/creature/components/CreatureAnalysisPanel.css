@@ -1,0 +1,324 @@
+.creature-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  background: var(--atlas-surface);
+  color: var(--atlas-text-primary);
+}
+
+.creature-analysis__header,
+.creature-analysis__cr-summary,
+.creature-analysis__cr-pair,
+.creature-analysis__stats,
+.creature-analysis__counts,
+.creature-analysis__mobility {
+  display: grid;
+  gap: 10px;
+}
+
+.creature-analysis__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.creature-analysis__header h3,
+.creature-analysis__section h4,
+.creature-analysis__breakdown h5 {
+  margin: 0;
+}
+
+.creature-analysis__header h3 {
+  font-size: 16px;
+}
+
+.creature-analysis__eyebrow {
+  margin: 0 0 3px;
+  color: var(--atlas-text-secondary);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.creature-analysis__live,
+.creature-analysis__muted {
+  color: var(--atlas-text-secondary);
+  font-size: 11px;
+}
+
+.creature-analysis__section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.creature-analysis__section h4 {
+  color: var(--atlas-text-secondary);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.creature-analysis__section h4 span {
+  margin-left: 5px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.creature-analysis__cr-summary {
+  grid-template-columns: minmax(120px, 0.85fr) minmax(170px, 1.15fr);
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+  overflow: hidden;
+}
+
+.creature-analysis__estimated,
+.creature-analysis__cr-pair > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 12px;
+  background: var(--atlas-surface-raised);
+}
+
+.creature-analysis__estimated {
+  grid-row: span 2;
+  background: color-mix(in srgb, var(--atlas-accent, #6e8db8) 14%, var(--atlas-surface-raised));
+}
+
+.creature-analysis__estimated span,
+.creature-analysis__cr-pair span,
+.creature-analysis__stats span,
+.creature-analysis__mobility span,
+.creature-analysis__count span {
+  color: var(--atlas-text-secondary);
+  font-size: 11px;
+}
+
+.creature-analysis__estimated strong {
+  font-size: 27px;
+  line-height: 1.1;
+}
+
+.creature-analysis__estimated small {
+  color: var(--atlas-text-secondary);
+  font-size: 10px;
+}
+
+.creature-analysis__cr-pair > div {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--atlas-border);
+}
+
+.creature-analysis__cr-pair > div:last-child {
+  border-bottom: 0;
+}
+
+.creature-analysis__cr-pair strong {
+  font-size: 16px;
+}
+
+.creature-analysis__stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.creature-analysis__ability-modifiers {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.creature-analysis__ability-modifiers > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 3px;
+  padding: 6px 7px;
+  border-radius: var(--atlas-radius-sm);
+  background: var(--atlas-surface-raised);
+  font-size: 10px;
+}
+
+.creature-analysis__ability-modifiers span {
+  color: var(--atlas-text-secondary);
+}
+
+.creature-analysis__stats > div,
+.creature-analysis__context-row,
+.creature-analysis__mobility > div,
+.creature-analysis__count {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.creature-analysis__stats i,
+.creature-analysis__context-row i {
+  display: block;
+  color: var(--atlas-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.creature-analysis__stats strong,
+.creature-analysis__context-row strong,
+.creature-analysis__mobility strong,
+.creature-analysis__count strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.creature-analysis__details {
+  border: 1px solid var(--atlas-border);
+  border-radius: var(--atlas-radius-sm);
+}
+
+.creature-analysis__details summary {
+  padding: 9px 11px;
+  cursor: pointer;
+  color: var(--atlas-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.creature-analysis__breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 11px 11px;
+}
+
+.creature-analysis__breakdown > section {
+  min-width: 0;
+}
+
+.creature-analysis__breakdown h5 {
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.creature-analysis__base,
+.creature-analysis__adjustment,
+.creature-analysis__result {
+  margin: 5px 0;
+  font-size: 11px;
+}
+
+.creature-analysis__factor {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--atlas-border);
+  font-size: 11px;
+}
+
+.creature-analysis__factor p {
+  margin: 2px 0 0;
+  color: var(--atlas-text-secondary);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.creature-analysis__factor > span {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+
+.creature-analysis__breakdown ul,
+.creature-analysis__notes,
+.creature-analysis__advisory ul {
+  margin: 0;
+  padding-left: 17px;
+}
+
+.creature-analysis__breakdown .creature-analysis__result {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1px solid var(--atlas-border);
+}
+
+.creature-analysis__final {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 9px;
+  background: var(--atlas-surface-raised);
+  font-size: 12px;
+}
+
+.creature-analysis__notes {
+  padding: 0 12px 10px 28px;
+  color: var(--atlas-text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.creature-analysis__context-row {
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--atlas-border);
+}
+
+.creature-analysis__context-row strong {
+  max-width: 62%;
+}
+
+.creature-analysis__mobility {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.creature-analysis__mobility > div,
+.creature-analysis__count {
+  padding: 7px 8px;
+  border-radius: var(--atlas-radius-sm);
+  background: var(--atlas-surface-raised);
+}
+
+.creature-analysis__counts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.creature-analysis__advisory {
+  padding: 10px 12px;
+  border-left: 3px solid var(--atlas-warning, #c99a43);
+  background: var(--atlas-surface-raised);
+  font-size: 11px;
+}
+
+.creature-analysis__advisory ul {
+  margin-top: 5px;
+  color: var(--atlas-text-secondary);
+  line-height: 1.4;
+}
+
+@media (max-width: 560px) {
+  .creature-analysis__cr-summary,
+  .creature-analysis__breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .creature-analysis__estimated {
+    grid-row: auto;
+  }
+
+  .creature-analysis__mobility {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .creature-analysis__ability-modifiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

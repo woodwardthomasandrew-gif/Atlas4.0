@@ -141,7 +141,7 @@ export function PrintStudioEditPage(): JSX.Element {
             ))}
           {!isNew && (
             <Button variant="primary" disabled={exporting || printing} onClick={handlePrint}>
-              {printing ? "Preparing…" : "Print"}
+              {printing ? "Preparing…" : "Open PDF to Print"}
             </Button>
           )}
           <Button variant="primary" onClick={handleSave}>

@@ -44,20 +44,27 @@ interface WrapOptions {
 
 function wrapLines(ctx: CanvasRenderingContext2D, text: string, options: WrapOptions): string[] {
   ctx.font = options.font;
-  const words = text.split(" ");
   const lines: string[] = [];
-  let line = "";
-
-  for (const word of words) {
-    const testLine = line.length === 0 ? word : `${line} ${word}`;
-    if (ctx.measureText(testLine).width > options.maxWidth && line.length > 0) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = testLine;
+  for (const paragraph of text.split("\n")) {
+    // drawWrapped advances one line for blank paragraphs too, so measurement
+    // must account for them rather than collapsing embedded newlines.
+    if (paragraph.trim().length === 0) {
+      lines.push("");
+      continue;
     }
+    const words = paragraph.split(" ");
+    let line = "";
+    for (const word of words) {
+      const testLine = line.length === 0 ? word : `${line} ${word}`;
+      if (ctx.measureText(testLine).width > options.maxWidth && line.length > 0) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.length > 0) lines.push(line);
   }
-  if (line.length > 0) lines.push(line);
   return lines;
 }
 

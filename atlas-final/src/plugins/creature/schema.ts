@@ -1,6 +1,7 @@
 import type { AssetSchema } from "@app/plugin-api/types";
 import { createDefaultDamage, type ItemDamage } from "@plugins/shared/damage";
 import { abilityModifier, formatModifier, type AbilityKey } from "@plugins/shared/abilities";
+import { calculatePassivePerception, proficiencyBonusForChallengeRating } from "./calculations";
 
 export type { AbilityKey };
 export { abilityModifier, formatModifier };
@@ -97,13 +98,7 @@ export const CR_TO_XP: Record<string, number> = {
   "30": 155000
 };
 
-/** Standard 5e creature proficiency bonus for a challenge rating. */
-export function proficiencyBonusForChallengeRating(challengeRating: string): number {
-  const [numerator, denominator] = challengeRating.split("/").map(Number);
-  const numericCr = denominator ? numerator / denominator : Number(challengeRating);
-  if (!Number.isFinite(numericCr)) return 2;
-  return Math.min(9, Math.max(2, Math.floor((numericCr - 1) / 4) + 2));
-}
+export { proficiencyBonusForChallengeRating };
 
 export interface CreatureSpeed {
   walk: number;
@@ -379,10 +374,11 @@ export function resolveExperience(data: CreatureData): number {
 }
 
 export function resolvePassivePerception(data: CreatureData): number {
-  if (!data.senses.passivePerception.auto) return data.senses.passivePerception.value;
-  const perceptionSkill = data.skills.find((s) => s.name.toLowerCase() === "perception");
-  const bonus = perceptionSkill ? perceptionSkill.bonus : abilityModifier(data.abilities.wis);
-  return 10 + bonus;
+  return calculatePassivePerception(
+    data.abilities.wis,
+    data.skills,
+    data.senses.passivePerception.auto ? undefined : data.senses.passivePerception.value
+  );
 }
 
 /**

@@ -6,8 +6,11 @@ import {
   type CardPlacement,
   type MultiCardColumns,
   type PageSize,
+  type PageOrientation,
   type PrintLayoutData,
-  PAGE_DIMENSIONS_IN
+  getPageDimensionsIn,
+  PAGE_SIZE_LABELS,
+  withPageSettings
 } from "../schema";
 import { CardLibrary } from "./CardLibrary";
 import { PageSurface } from "./PageSurface";
@@ -75,7 +78,7 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
   const fitToView = (): void => {
     const viewport = canvasScrollRef.current;
     if (!viewport) return;
-    const dims = PAGE_DIMENSIONS_IN[data.pageSize];
+    const dims = getPageDimensionsIn(data.pageSize, data.orientation);
     const availableWidth = Math.max(0, viewport.clientWidth - 24);
     const availableHeight = Math.max(0, viewport.clientHeight - 24);
     const fitPercent = Math.min(
@@ -101,10 +104,22 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
           <span>Page Size</span>
           <select
             value={data.pageSize}
-            onChange={(e) => onChange({ ...data, pageSize: e.target.value as PageSize })}
+            onChange={(e) => onChange(withPageSettings(data, e.target.value as PageSize))}
           >
-            <option value="letter">US Letter</option>
-            <option value="a4">A4</option>
+            {Object.entries(PAGE_SIZE_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="print-studio-editor__page-size">
+          <span>Orientation</span>
+          <select
+            value={data.orientation ?? "portrait"}
+            onChange={(e) => onChange(withPageSettings(data, data.pageSize, e.target.value as PageOrientation))}
+          >
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
           </select>
         </label>
 
@@ -187,6 +202,7 @@ export function PrintStudioEditor({ data, onChange }: AssetEditorProps<PrintLayo
           <PageSurface
             page={activePage}
             pageSize={data.pageSize}
+            orientation={data.orientation ?? "portrait"}
             multiCardColumns={data.multiCardColumns ?? 1}
             zoom={zoom / 100}
             showGrid={showGrid}

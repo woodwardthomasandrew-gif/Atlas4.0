@@ -14,4 +14,16 @@ export interface AtlasTheme {
   };
 }
 
-export type ThemeId = "dark" | "light";
+export type ThemeId = "dark" | "light" | "midnight" | "parchment" | "forest" | "high-contrast" | "arctic-blue" | "pastel" | "admiralty-chart";
+
+export type AppearanceMode = "manual" | "scheduled" | "system";
+export interface AppearanceSettings {
+  mode: AppearanceMode;
+  manualTheme: ThemeId;
+  dayTheme: ThemeId;
+  nightTheme: ThemeId;
+  nightStart: string;
+  dayStart: string;
+  systemLightTheme: ThemeId;
+  systemDarkTheme: ThemeId;
+}

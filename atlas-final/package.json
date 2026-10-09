@@ -15,6 +15,7 @@
     "electron:watch": "wait-on tcp:5173 && cross-env ATLAS_DEV=1 electron .",
     "dev": "npm run electron:compile && concurrently -k -n VITE,ELECTRON -c cyan,magenta \"npm run vite:dev\" \"npm run electron:watch\"",
     "build": "tsc -b && vite build && npm run electron:compile",
+    "dist": "npm run build && electron-builder --win nsis",
     "typecheck": "tsc -b --noEmit && tsc -p electron/tsconfig.json --noEmit",
     "start": "electron .",
     "lint": "eslint . --ext .ts,.tsx",
@@ -39,10 +40,39 @@
     "concurrently": "^10.0.4",
     "cross-env": "^10.1.0",
     "electron": "^31.3.0",
+    "electron-builder": "^26.15.3",
     "jsdom": "^30.0.1",
+    "png-to-ico": "^3.0.2",
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
     "vitest": "^4.1.10",
     "wait-on": "^9.1.0"
+  },
+  "build": {
+    "appId": "com.alaruel.atlas",
+    "productName": "Alaruel Atlas",
+    "executableName": "AlaruelAtlas",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "build-resources/atlas.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Alaruel Atlas"
+    }
   }
 }

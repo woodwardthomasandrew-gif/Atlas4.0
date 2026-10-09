@@ -2,16 +2,18 @@ import { jsPDF } from "jspdf";
 import { getAsset } from "@app/db/assetStore";
 import { getComponent } from "@app/db/componentStore";
 import { getAllAssetTypes } from "@app/registry/assetRegistry";
-import type { PrintLayoutData } from "./schema";
+import { getPageDimensionsIn, type PrintLayoutData } from "./schema";
 import { renderComponentCard } from "@plugins/trait/cardRenderer";
 
 export async function exportPrintLayoutToPdf(data: PrintLayoutData): Promise<Uint8Array> {
-  const format = data.pageSize === "letter" ? "letter" : "a4";
-  const pdf = new jsPDF({ unit: "in", format, orientation: "portrait" });
+  const orientation = data.orientation ?? "portrait";
+  const dimensions = getPageDimensionsIn(data.pageSize, orientation);
+  const format: [number, number] = [dimensions.widthIn, dimensions.heightIn];
+  const pdf = new jsPDF({ unit: "in", format, orientation });
 
   for (let pageIndex = 0; pageIndex < data.pages.length; pageIndex++) {
     if (pageIndex > 0) {
-      pdf.addPage(format, "portrait");
+      pdf.addPage(format, orientation);
     }
 
     const page = data.pages[pageIndex];

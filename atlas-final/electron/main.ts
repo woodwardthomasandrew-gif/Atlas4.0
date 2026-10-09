@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { AtlasDatabase } from "./database";
@@ -67,30 +67,10 @@ function registerIpcHandlers(database: AtlasDatabase): void {
 
     const tempPdfPath = path.join(app.getPath("temp"), `atlas-print-${crypto.randomUUID()}.pdf`);
 
-    try {
-      await fs.writeFile(tempPdfPath, Buffer.from(pdf));
-      const printWindow = new BrowserWindow({
-        show: false,
-        webPreferences: {
-          contextIsolation: true,
-          nodeIntegration: false,
-          sandbox: true
-        }
-      });
-
-      try {
-        await printWindow.loadFile(tempPdfPath);
-        await new Promise<void>((resolve, reject) => {
-          printWindow.webContents.print({ silent: false, printBackground: true }, (success, failureReason) => {
-            if (success) resolve();
-            else reject(new Error(failureReason || "Printing was cancelled."));
-          });
-        });
-      } finally {
-        if (!printWindow.isDestroyed()) printWindow.destroy();
-      }
-    } finally {
-      await fs.rm(tempPdfPath, { force: true });
+    await fs.writeFile(tempPdfPath, Buffer.from(pdf));
+    const openError = await shell.openPath(tempPdfPath);
+    if (openError) {
+      throw new Error(`Could not open the print-ready PDF: ${openError}`);
     }
   });
   ipcMain.handle("atlas:app:save-complete", () => {
