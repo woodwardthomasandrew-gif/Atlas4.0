@@ -16,6 +16,7 @@ export const shortcutDefinitions: ShortcutDefinition[] = [
   { id: "creatures", label: "Creatures", keys: "Ctrl+3" },
   { id: "spells", label: "Spells", keys: "Ctrl+4" },
   { id: "print-studio-nav", label: "Print Studio", keys: "Ctrl+5" },
+  { id: "handout-studio-nav", label: "Handout Studio", keys: "Ctrl+6" },
   { id: "undo", label: "Undo", keys: "Ctrl+Z", allowInTextEntry: true },
   { id: "redo", label: "Redo", keys: "Ctrl+Shift+Z", allowInTextEntry: true },
   { id: "duplicate", label: "Duplicate current asset", keys: "Ctrl+D" },

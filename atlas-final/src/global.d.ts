@@ -15,6 +15,7 @@ interface AtlasBridge {
   app: {
     getVersion: () => Promise<string>;
     printPdf: (pdf: Uint8Array) => Promise<void>;
+    savePdf: (pdf: Uint8Array, name: string) => Promise<boolean>;
     onRequestSave: (listener: () => void | Promise<void>) => () => void;
     saveComplete: () => Promise<void>;
   };

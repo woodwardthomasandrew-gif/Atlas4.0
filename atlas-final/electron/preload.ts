@@ -16,6 +16,7 @@ const atlasBridge = {
   app: {
     getVersion: () => ipcRenderer.invoke("atlas:app:getVersion"),
     printPdf: (pdf: Uint8Array) => ipcRenderer.invoke("atlas:app:print-pdf", pdf),
+    savePdf: (pdf: Uint8Array, name: string) => ipcRenderer.invoke("atlas:app:save-pdf", pdf, name),
     onRequestSave: (listener: () => void | Promise<void>) => { const handler = (): void => { void listener(); }; ipcRenderer.on("atlas:app:request-save", handler); return () => ipcRenderer.removeListener("atlas:app:request-save", handler); },
     saveComplete: () => ipcRenderer.invoke("atlas:app:save-complete")
   }

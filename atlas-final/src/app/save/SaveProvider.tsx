@@ -18,7 +18,7 @@ export function SaveProvider({ children }: { children: ReactNode }): JSX.Element
   const notifySaved = useCallback((reason: SaveReason) => setNotification(`${messageFor(reason)} · ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`), []);
 
   useEffect(() => {
-    const onRequestSave = async (): Promise<void> => { try { const saved = await handlerRef.current?.("close"); if (saved) notifySaved("close"); } finally { await window.atlas.app.saveComplete(); } };
+    const onRequestSave = async (): Promise<void> => { try { const saved = await handlerRef.current?.("close"); if (saved === false) return; if (saved) notifySaved("close"); await window.atlas.app.saveComplete(); } catch { /* A failed close-save keeps the window open so the user can retry. */ } };
     return window.atlas.app.onRequestSave(onRequestSave);
   }, [notifySaved]);
   useEffect(() => { if (!notification) return; const timer = window.setTimeout(() => setNotification(null), 3000); return () => window.clearTimeout(timer); }, [notification]);

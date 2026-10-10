@@ -1,0 +1,9 @@
+# Handout Studio
+
+Handouts are generic Atlas assets with type `handout`. Their JSON payload uses `schemaVersion: 1`; Fabric objects are an editor detail and are never persisted as the document format. Each page stores inch dimensions, a background, a paper effect setting, and ordered typed elements. Element x/y/width/height values are CSS pixels at the fixed scale of 96 px per inch. PDF rendering converts those values to 72 points per inch.
+
+Imported artwork is stored once as a separate generic asset of type `handout-artwork`, with a local image data URL in its JSON payload. Handouts contain only the artwork asset ID. Both document and artwork rows live in the existing `assets` table in `atlas.db`; existing full-database backups therefore include the referenced artwork. Deleting a handout does not remove artwork because other handouts can share it. Orphan artwork may be removed manually only after confirming it is unreferenced.
+
+The PDF exporter creates vector page backgrounds, shapes, and text with jsPDF. It adds each mixed-size page using its own physical point dimensions. Raster output is limited to imported image elements (and optional paper color effects remain vector overlays). jsPDF's built-in fonts are used: common serif, sans-serif, and monospaced families map to Times, Helvetica, and Courier. Font metrics and glyph coverage can differ from the local Fabric canvas, especially for non-Latin Unicode characters; embedded arbitrary fonts and exact font matching are not currently supported.
+
+Open **Handout Studio** from the left navigation (or Ctrl+6), choose a template, edit its canvas, then use **Export PDF** to select a local save path or **Open PDF to Print** to open the generated PDF in the system viewer. Use **Save & close** or Ctrl+S to save immediately; the existing Atlas autosave and close-save lifecycle also applies.

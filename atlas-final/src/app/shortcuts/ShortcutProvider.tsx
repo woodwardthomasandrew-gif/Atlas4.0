@@ -50,6 +50,7 @@ export function ShortcutProvider({ children }: { children: ReactNode }): JSX.Ele
       else if (matches(event, "3")) action = "creatures";
       else if (matches(event, "4")) action = "spells";
       else if (matches(event, "5")) action = "print-studio-nav";
+      else if (matches(event, "6")) action = "handout-studio-nav";
       else if (matches(event, "z")) action = event.shiftKey ? "redo" : "undo";
       else if (matches(event, "d")) action = "duplicate";
       if (!action) return;
@@ -73,9 +74,9 @@ export function ShortcutProvider({ children }: { children: ReactNode }): JSX.Ele
   }, [closePalette, location.pathname, openPalette, paletteQuery]);
 
   useEffect(() => {
-    const navigation: Record<string, string> = { dashboard: "/", "magic-items": "/magic-items", creatures: "/creatures", spells: "/spells", "print-studio-nav": "/print-studio", settings: "/settings", "print-studio": "/print-studio" };
+    const navigation: Record<string, string> = { dashboard: "/", "magic-items": "/magic-items", creatures: "/creatures", spells: "/spells", "print-studio-nav": "/print-studio", "handout-studio-nav": "/handout-studio", settings: "/settings", "print-studio": "/print-studio" };
     const cleanups = Object.entries(navigation).map(([id, path]) => register(id, () => navigate(path)));
-    const currentRoot = ["/magic-items", "/creatures", "/spells", "/print-studio"].find((path) => location.pathname.startsWith(path));
+    const currentRoot = ["/magic-items", "/creatures", "/spells", "/print-studio", "/handout-studio"].find((path) => location.pathname.startsWith(path));
     cleanups.push(register("new-asset", () => navigate(currentRoot ? `${currentRoot}/new` : "/magic-items/new")));
     return () => cleanups.forEach((cleanup) => cleanup());
   }, [location.pathname, navigate, register]);

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { AtlasDatabase } from "./database";
@@ -72,6 +72,14 @@ function registerIpcHandlers(database: AtlasDatabase): void {
     if (openError) {
       throw new Error(`Could not open the print-ready PDF: ${openError}`);
     }
+  });
+  ipcMain.handle("atlas:app:save-pdf", async (_event, pdf: Uint8Array, suggestedName: string) => {
+    if (!pdf || pdf.byteLength === 0) throw new Error("Cannot save an empty PDF.");
+    const safeName = path.basename(String(suggestedName || "handout.pdf")).replace(/[<>:"/\\|?*]/g, "_");
+    const result = await dialog.showSaveDialog({ title: "Export Handout PDF", defaultPath: safeName.endsWith(".pdf") ? safeName : `${safeName}.pdf`, filters: [{ name: "PDF document", extensions: ["pdf"] }] });
+    if (result.canceled || !result.filePath) return false;
+    await fs.writeFile(result.filePath, Buffer.from(pdf));
+    return true;
   });
   ipcMain.handle("atlas:app:save-complete", () => {
     if (!mainWindow || isClosing) return;
