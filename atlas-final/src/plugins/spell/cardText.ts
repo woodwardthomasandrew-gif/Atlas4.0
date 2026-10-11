@@ -32,6 +32,11 @@ export function formatResolutionLine(data: SpellData): string | null {
 export function formatDamageHealingLine(data: SpellData): string | null {
   const parts: string[] = [];
   if (data.hasDamage) parts.push(describeDamage(data.damage));
-  if (data.hasHealing) parts.push(`heals ${describeDamage(data.healing).replace(" damage", "")}`);
+  if (data.hasHealing) {
+    const bonus = data.healing.bonus
+      ? data.healing.bonus > 0 ? ` + ${data.healing.bonus}` : ` - ${Math.abs(data.healing.bonus)}`
+      : "";
+    parts.push(`heals ${data.healing.diceCount}${data.healing.diceType}${bonus}`);
+  }
   return parts.length > 0 ? parts.join("; ") : null;
 }

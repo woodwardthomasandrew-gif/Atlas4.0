@@ -7,6 +7,8 @@ Alaruel Atlas is an offline desktop workshop for creating tabletop role-playing 
 - Create and manage creature stat blocks, spells, and magic items. Search and duplicate saved assets, then export them as JSON or Markdown.
 - Build reusable traits and drag them into creature stat blocks or print layouts.
 - Lay out cards on US Letter or A4 pages in Print Studio, including multi-page creature cards. Export a PDF or open it in your system PDF viewer to print.
+- Create in-world letters, notices, posters, and other printable documents in Handout Studio. Start from a blank page or a built-in design, then edit text, shapes, artwork, and paper effects.
+- Start creature, spell, and magic-item assets from reusable templates, then customize and save them as ordinary library assets.
 - Use dark or light themes, keyboard shortcuts, undo and redo, and configurable autosave.
 
 ## Install and run
@@ -67,7 +69,7 @@ electron/       Electron main process, secure preload bridge, SQLite persistence
 src/app/        Shared registries, database stores, routing, settings, themes, shortcuts
 src/ui/         Shared shell and UI components
 src/pages/      Dashboard and settings
-src/plugins/    Creature, spell, magic item, trait, and Print Studio features
+src/plugins/    Creature, spell, magic item, trait, Print Studio, and Handout Studio features
 docs/           User and development guides
 ```
 
@@ -76,5 +78,6 @@ The renderer runs with context isolation enabled, Node integration disabled, and
 ## Documentation
 
 - [User Guide](docs/USER_GUIDE.md)
+- [Handout Studio](docs/handout-studio.md)
 - [Development](docs/DEVELOPMENT.md)
 

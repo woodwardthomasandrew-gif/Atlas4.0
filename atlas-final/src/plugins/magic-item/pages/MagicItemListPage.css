@@ -10,6 +10,12 @@
   margin: 0;
 }
 
+.magic-item-list__create-actions { display: flex; gap: 8px; }
+.magic-item-template-list { display: grid; gap: 10px; }
+.magic-item-template-list__item { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--atlas-border); border-radius: var(--atlas-radius-sm); color: inherit; text-decoration: none; }
+.magic-item-template-list__item:hover { background: var(--atlas-surface-raised); }
+.magic-item-template-list__category { color: var(--atlas-text-secondary); font-size: 12px; }
+
 .magic-item-list__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

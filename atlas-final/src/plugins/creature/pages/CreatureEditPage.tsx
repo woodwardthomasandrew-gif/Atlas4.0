@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
@@ -9,6 +9,7 @@ import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
 import { useHistoryState } from "@app/shortcuts/useHistoryState";
 import { duplicateAsset } from "@app/db/assetStore";
 import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
+import { getAssetTemplate, instantiateAssetTemplate } from "@app/templates/templateCatalog";
 import "./CreatureEditPage.css";
 
 function generateId(): string {
@@ -17,8 +18,10 @@ function generateId(): string {
 
 export function CreatureEditPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isNew = id === "new";
+  const templateId = isNew ? searchParams.get("template") : null;
 
   const definition = getAssetType(CREATURE_TYPE);
   if (!definition) {
@@ -26,8 +29,20 @@ export function CreatureEditPage(): JSX.Element {
   }
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
-  const [name, setName] = useState("");
-  const [data, setData, undo, redo] = useHistoryState<CreatureData>(definition.createDefaultData() as CreatureData);
+  const [name, setName] = useState(() => {
+    if (!templateId) return "";
+    return getAssetTemplate(templateId)?.name.replace(" — Blank Template", " (Homebrew)") ?? "";
+  });
+  const [data, setData, undo, redo] = useHistoryState<CreatureData>(() => {
+    if (!templateId) return definition.createDefaultData() as CreatureData;
+    try { return instantiateAssetTemplate<CreatureData>(templateId, CREATURE_TYPE); }
+    catch { return definition.createDefaultData() as CreatureData; }
+  });
+  const [templateError] = useState<string | null>(() => {
+    if (!templateId) return null;
+    try { instantiateAssetTemplate(templateId, CREATURE_TYPE); return null; }
+    catch (error) { return error instanceof Error ? error.message : "Template could not be loaded."; }
+  });
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
   const { notifySaved } = useSaveContext();
@@ -135,6 +150,8 @@ export function CreatureEditPage(): JSX.Element {
           ))}
         </Card>
       )}
+
+      {templateError && <Card className="creature-edit__errors">Template could not be used: {templateError} A blank creature has been opened instead.</Card>}
 
       <label className="creature-edit__name-field">
         <span>Name</span>

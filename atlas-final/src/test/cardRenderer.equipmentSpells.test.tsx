@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { formatEquipmentEntry, groupSpellsByLevel, spellLevelLabel } from "@plugins/creature/cardText";
 import { normalizeCreatureData, createDefaultCreatureData } from "@plugins/creature/schema";
+import { formatDamageHealingLine } from "@plugins/spell/cardText";
+import { createDefaultSpellData } from "@plugins/spell/schema";
 
 describe("equipment formatting", () => {
   it("formats name, quantity, and notes", () => {
@@ -38,6 +40,15 @@ describe("spell grouping", () => {
     expect(spellLevelLabel(1)).toBe("1st Level");
     expect(spellLevelLabel(2)).toBe("2nd Level");
     expect(spellLevelLabel(9)).toBe("9th Level");
+  });
+});
+
+describe("spell damage and healing formatting", () => {
+  it("does not present the shared damage type field as part of a healing amount", () => {
+    const data = createDefaultSpellData();
+    data.hasHealing = true;
+    data.healing = { diceCount: 2, diceType: "d8", bonus: 3, damageType: "radiant" };
+    expect(formatDamageHealingLine(data)).toBe("heals 2d8 + 3");
   });
 });
 

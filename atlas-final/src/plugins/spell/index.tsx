@@ -10,6 +10,7 @@ import { SpellEditor } from "./components/SpellEditor";
 import { SpellPreview } from "./components/SpellPreview";
 import { SpellListPage } from "./pages/SpellListPage";
 import { SpellEditPage } from "./pages/SpellEditPage";
+import { registerSpellTemplates } from "./templates";
 
 export { SPELL_TYPE };
 
@@ -28,6 +29,7 @@ const spellDefinition: AssetTypeDefinition<SpellData> = {
 };
 
 export function registerSpellPlugin(): void {
+  registerSpellTemplates();
   registerAssetType(spellDefinition as AssetTypeDefinition<unknown>);
 
   registerNavItem({

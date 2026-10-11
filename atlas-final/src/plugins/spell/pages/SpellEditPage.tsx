@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
@@ -9,6 +9,7 @@ import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
 import { useHistoryState } from "@app/shortcuts/useHistoryState";
 import { duplicateAsset } from "@app/db/assetStore";
 import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
+import { getAssetTemplate, instantiateAssetTemplate } from "@app/templates/templateCatalog";
 import "./SpellEditPage.css";
 
 function generateId(): string {
@@ -17,8 +18,10 @@ function generateId(): string {
 
 export function SpellEditPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isNew = id === "new";
+  const templateId = isNew ? searchParams.get("template") : null;
 
   const definition = getAssetType(SPELL_TYPE);
   if (!definition) {
@@ -26,8 +29,25 @@ export function SpellEditPage(): JSX.Element {
   }
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
-  const [name, setName] = useState("");
-  const [data, setData, undo, redo] = useHistoryState<SpellData>(definition.createDefaultData() as SpellData);
+  const [name, setName] = useState(() => {
+    if (!templateId) return "";
+    const template = getAssetTemplate(templateId);
+    if (template?.assetType !== SPELL_TYPE) return "";
+    try {
+      instantiateAssetTemplate(templateId, SPELL_TYPE);
+      return template.defaultAssetName ?? template.name;
+    } catch { return ""; }
+  });
+  const [data, setData, undo, redo] = useHistoryState<SpellData>(() => {
+    if (!templateId) return definition.createDefaultData() as SpellData;
+    try { return instantiateAssetTemplate<SpellData>(templateId, SPELL_TYPE); }
+    catch { return definition.createDefaultData() as SpellData; }
+  });
+  const [templateError] = useState<string | null>(() => {
+    if (!templateId) return null;
+    try { instantiateAssetTemplate(templateId, SPELL_TYPE); return null; }
+    catch (error) { return error instanceof Error ? error.message : "Template could not be loaded."; }
+  });
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
   const { notifySaved } = useSaveContext();
@@ -135,6 +155,8 @@ export function SpellEditPage(): JSX.Element {
           ))}
         </Card>
       )}
+
+      {templateError && <Card className="spell-edit__errors">Template could not be used: {templateError} A blank spell has been opened instead.</Card>}
 
       <label className="spell-edit__name-field">
         <span>Name</span>

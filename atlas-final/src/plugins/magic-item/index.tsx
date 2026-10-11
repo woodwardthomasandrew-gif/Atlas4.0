@@ -15,6 +15,7 @@ import { MagicItemEditor } from "./components/MagicItemEditor";
 import { MagicItemPreview } from "./components/MagicItemPreview";
 import { MagicItemListPage } from "./pages/MagicItemListPage";
 import { MagicItemEditPage } from "./pages/MagicItemEditPage";
+import { registerMagicItemTemplates } from "./templates";
 
 export { MAGIC_ITEM_TYPE };
 
@@ -33,6 +34,7 @@ const magicItemDefinition: AssetTypeDefinition<MagicItemData> = {
 };
 
 export function registerMagicItemPlugin(): void {
+  registerMagicItemTemplates();
   registerAssetType(magicItemDefinition as AssetTypeDefinition<unknown>);
 
   registerNavItem({

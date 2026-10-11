@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
-export function useHistoryState<T>(initial: T): [T, (next: T) => void, () => void, () => void] {
-  const [value, setValue] = useState(initial);
+export function useHistoryState<T>(initial: T | (() => T)): [T, (next: T) => void, () => void, () => void] {
+  const [value, setValue] = useState<T>(initial);
   const past = useRef<T[]>([]);
   const future = useRef<T[]>([]);
   const update = useCallback((next: T) => { past.current.push(value); future.current = []; setValue(next); }, [value]);

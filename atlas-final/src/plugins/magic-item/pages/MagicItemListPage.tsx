@@ -5,12 +5,16 @@ import { listAssets, type AssetRecord } from "@app/db/assetStore";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
 import { AssetSearchField } from "@plugins/shared/components/AssetSearchField";
 import { filterAssetsByName } from "@app/search/assetSearch";
+import { listAssetTemplates } from "@app/templates/templateCatalog";
+import { Modal } from "@ui/components/Modal";
 import { MAGIC_ITEM_TYPE } from "../schema";
 import "./MagicItemListPage.css";
 
 export function MagicItemListPage(): JSX.Element {
   const [items, setItems] = useState<AssetRecord[] | null>(null);
   const [query, setQuery] = useState("");
+  const [showTemplates, setShowTemplates] = useState(false);
+  const templates = listAssetTemplates(MAGIC_ITEM_TYPE);
 
   useEffect(() => {
     listAssets(MAGIC_ITEM_TYPE).then(setItems);
@@ -22,9 +26,10 @@ export function MagicItemListPage(): JSX.Element {
     <div className="magic-item-list">
       <header className="magic-item-list__header">
         <h1>Magic Items</h1>
-        <Link to="/magic-items/new">
-          <Button variant="primary">New Magic Item</Button>
-        </Link>
+        <div className="magic-item-list__create-actions">
+          <Link to="/magic-items/new"><Button variant="primary">New Magic Item</Button></Link>
+          <Button onClick={() => setShowTemplates(true)}>Create from Template</Button>
+        </div>
       </header>
 
       {items === null && <p>Loading…</p>}
@@ -58,6 +63,25 @@ export function MagicItemListPage(): JSX.Element {
             </Link>
           ))}
         </div>
+      )}
+
+      {showTemplates && (
+        <Modal title="Create Magic Item from Template" onClose={() => setShowTemplates(false)} wide>
+          <div className="magic-item-template-list">
+            {templates.map((template) => (
+              <Link
+                key={template.id}
+                to={`/magic-items/new?template=${encodeURIComponent(template.id)}`}
+                className="magic-item-template-list__item"
+                onClick={() => setShowTemplates(false)}
+              >
+                <strong>{template.name}</strong>
+                <span className="magic-item-template-list__category">{template.category}</span>
+                <span>{template.description}</span>
+              </Link>
+            ))}
+          </div>
+        </Modal>
       )}
     </div>
   );

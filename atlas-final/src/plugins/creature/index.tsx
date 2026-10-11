@@ -10,6 +10,7 @@ import { CreatureEditor } from "./components/CreatureEditor";
 import { CreaturePreview } from "./components/CreaturePreview";
 import { CreatureListPage } from "./pages/CreatureListPage";
 import { CreatureEditPage } from "./pages/CreatureEditPage";
+import { registerCreatureTemplates } from "./templates";
 
 export { CREATURE_TYPE };
 
@@ -29,6 +30,7 @@ const creatureDefinition: AssetTypeDefinition<CreatureData> = {
 };
 
 export function registerCreaturePlugin(): void {
+  registerCreatureTemplates();
   registerAssetType(creatureDefinition as AssetTypeDefinition<unknown>);
 
   registerNavItem({

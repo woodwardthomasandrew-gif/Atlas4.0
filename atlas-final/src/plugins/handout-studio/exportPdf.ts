@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { getAsset } from "@app/db/assetStore";
 import { pxToPt, type HandoutData, type HandoutElement } from "./schema";
+import { createPaperTexture } from "./paperTexture";
 
 function addElement(pdf: jsPDF, element: HandoutElement, yPage: number, imageMap: Map<string, string>): void {
   if (!element.visible || element.opacity <= 0) return;
@@ -48,17 +49,9 @@ export async function exportHandoutPdf(data: HandoutData): Promise<Uint8Array> {
     const pointSize: [number, number] = [size[0] * 72, size[1] * 72];
     const orientation = pointSize[0] > pointSize[1] ? "landscape" : "portrait";
     if (!pdf) pdf = new jsPDF({ unit: "pt", format: pointSize, orientation, compress: false }); else pdf.addPage(pointSize, orientation);
-    if (page.background !== "#ffffff" && page.background !== "#fff") { pdf.setFillColor(page.background); pdf.rect(0, 0, pointSize[0], pointSize[1], "F"); }
-    if (page.texture === "parchment" || page.texture === "aged") {
-      pdf.setFillColor(page.texture === "aged" ? "#9b7046" : "#b39a6b");
-      pdf.setGState(new (pdf as any).GState({ opacity: page.texture === "aged" ? 0.07 : 0.045 }));
-      for (let i = 0; i < 9; i++) {
-        const x = 35 + (i % 3) * page.widthIn * 96 / 3, y = 45 + Math.floor(i / 3) * page.heightIn * 96 / 3;
-        const rx = 36 + (i % 2) * 15, ry = 20 + (i % 3) * 8;
-        pdf.ellipse(pxToPt(x + rx), pxToPt(y + ry), pxToPt(rx), pxToPt(ry), "F");
-      }
-      pdf.setGState(new (pdf as any).GState({ opacity: 1 }));
-    }
+    const texture=createPaperTexture(page);
+    if(texture) pdf.addImage(texture.toDataURL("image/png"),"PNG",0,0,pointSize[0],pointSize[1],`paper-${page.id}`,"FAST");
+    else if (page.background !== "#ffffff" && page.background !== "#fff") { pdf.setFillColor(page.background); pdf.rect(0, 0, pointSize[0], pointSize[1], "F"); }
     for (const element of page.elements) addElement(pdf, element, 0, imageMap);
   }
   return new Uint8Array(pdf!.output("arraybuffer"));

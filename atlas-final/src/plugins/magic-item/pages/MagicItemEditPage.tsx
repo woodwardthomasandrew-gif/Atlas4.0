@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Card, Input } from "@ui/components";
 import { getAssetType } from "@app/registry/assetRegistry";
 import { DuplicateAssetButton } from "@plugins/shared/components/DuplicateAssetButton";
@@ -9,6 +9,7 @@ import { useShortcutAction } from "@app/shortcuts/ShortcutProvider";
 import { useHistoryState } from "@app/shortcuts/useHistoryState";
 import { duplicateAsset } from "@app/db/assetStore";
 import { useAutosave, useSaveContext, type SaveReason } from "@app/save/SaveProvider";
+import { getAssetTemplate, instantiateAssetTemplate } from "@app/templates/templateCatalog";
 import "./MagicItemEditPage.css";
 
 function generateId(): string {
@@ -17,8 +18,10 @@ function generateId(): string {
 
 export function MagicItemEditPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isNew = id === "new";
+  const templateId = isNew ? searchParams.get("template") : null;
 
   const definition = getAssetType(MAGIC_ITEM_TYPE);
   if (!definition) {
@@ -26,8 +29,25 @@ export function MagicItemEditPage(): JSX.Element {
   }
 
   const [assetId] = useState(() => (isNew ? generateId() : (id as string)));
-  const [name, setName] = useState("");
-  const [data, setData, undo, redo] = useHistoryState<MagicItemData>(definition.createDefaultData() as MagicItemData);
+  const [name, setName] = useState(() => {
+    if (!templateId) return "";
+    const template = getAssetTemplate(templateId);
+    if (template?.assetType !== MAGIC_ITEM_TYPE) return "";
+    try {
+      instantiateAssetTemplate(templateId, MAGIC_ITEM_TYPE);
+      return template.defaultAssetName ?? template.name;
+    } catch { return ""; }
+  });
+  const [data, setData, undo, redo] = useHistoryState<MagicItemData>(() => {
+    if (!templateId) return definition.createDefaultData() as MagicItemData;
+    try { return instantiateAssetTemplate<MagicItemData>(templateId, MAGIC_ITEM_TYPE); }
+    catch { return definition.createDefaultData() as MagicItemData; }
+  });
+  const [templateError] = useState<string | null>(() => {
+    if (!templateId) return null;
+    try { instantiateAssetTemplate(templateId, MAGIC_ITEM_TYPE); return null; }
+    catch (error) { return error instanceof Error ? error.message : "Template could not be loaded."; }
+  });
   const [loaded, setLoaded] = useState(isNew);
   const [errors, setErrors] = useState<string[]>([]);
   const { notifySaved } = useSaveContext();
@@ -135,6 +155,8 @@ export function MagicItemEditPage(): JSX.Element {
           ))}
         </Card>
       )}
+
+      {templateError && <Card className="magic-item-edit__errors">Template could not be used: {templateError} A blank magic item has been opened instead.</Card>}
 
       <label className="magic-item-edit__name-field">
         <span>Name</span>
